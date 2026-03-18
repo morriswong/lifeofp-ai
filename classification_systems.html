@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classifying the Classifiers — Library Classification Systems</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1117; color: #e0e0e0; overflow-x: hidden; }
+
+  /* Header */
+  .header { padding: 40px 40px 20px; max-width: 1400px; margin: 0 auto; }
+  .header h1 { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .header p { font-size: 14px; color: #888; max-width: 700px; line-height: 1.5; }
+
+  /* Filter bar */
+  .filter-bar { padding: 16px 40px; max-width: 1400px; margin: 0 auto; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .filter-group { display: flex; align-items: center; gap: 6px; }
+  .filter-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: #666; font-weight: 600; }
+  .filter-btn {
+    padding: 6px 14px; border-radius: 20px; border: 1px solid #333; background: transparent;
+    color: #aaa; font-size: 12px; cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: #555; color: #ddd; }
+  .filter-btn.active { background: #fff; color: #111; border-color: #fff; font-weight: 600; }
+
+  /* Main layout */
+  .main { display: flex; max-width: 1400px; margin: 0 auto; padding: 20px 40px; gap: 30px; }
+
+  /* Left: visualization area */
+  .viz-area { flex: 1; min-width: 0; }
+
+  /* View tabs */
+  .view-tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+  .view-tab {
+    padding: 8px 18px; border-radius: 8px; border: none; background: #1a1d27;
+    color: #888; font-size: 13px; cursor: pointer; transition: all 0.2s; font-weight: 500;
+  }
+  .view-tab:hover { background: #252830; color: #bbb; }
+  .view-tab.active { background: #2a2d3a; color: #fff; }
+
+  /* Grid view */
+  .grid-container { display: none; }
+  .grid-container.active { display: block; }
+
+  /* Methodology grid */
+  .method-section { margin-bottom: 30px; }
+  .method-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 8px;
+    border-bottom: 1px solid #222;
+  }
+  .method-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .method-title { font-size: 15px; font-weight: 600; color: #ccc; }
+  .method-desc { font-size: 12px; color: #666; margin-left: auto; }
+
+  .cards-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  .card {
+    background: #181b22; border: 1px solid #252830; border-radius: 12px; padding: 16px;
+    width: 180px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden;
+  }
+  .card:hover { border-color: #444; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+  .card.highlighted { border-color: #667eea; box-shadow: 0 0 20px rgba(102,126,234,0.15); }
+  .card.dimmed { opacity: 0.25; }
+
+  .card-abbr { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+  .card-name { font-size: 11px; color: #888; margin-bottom: 10px; line-height: 1.3; }
+  .card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .card-tag {
+    font-size: 9px; padding: 2px 7px; border-radius: 10px; background: #252830; color: #777;
+    white-space: nowrap;
+  }
+  .card-method-stripe {
+    position: absolute; top: 0; left: 0; width: 3px; height: 100%; border-radius: 3px 0 0 3px;
+  }
+
+  /* Timeline view */
+  .timeline-container { display: none; position: relative; padding: 20px 0; }
+  .timeline-container.active { display: block; }
+
+  .timeline-line {
+    position: absolute; top: 50%; left: 40px; right: 40px; height: 2px; background: #252830;
+  }
+  .timeline-eras { display: flex; justify-content: space-between; padding: 0 40px; margin-bottom: 60px; }
+  .timeline-era { text-align: center; }
+  .timeline-era-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
+  .timeline-era-years { font-size: 13px; color: #888; font-weight: 600; margin-top: 2px; }
+
+  .timeline-items { position: relative; height: 400px; margin: 0 40px; }
+  .timeline-item {
+    position: absolute; cursor: pointer; transition: all 0.25s;
+  }
+  .timeline-item:hover { transform: scale(1.1); z-index: 10; }
+  .timeline-item.dimmed { opacity: 0.2; }
+  .timeline-node {
+    width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: 9px; font-weight: 700; color: #fff; border: 2px solid;
+    background: #181b22; position: relative;
+  }
+  .timeline-label {
+    position: absolute; top: 48px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: #888; white-space: nowrap; text-align: center;
+  }
+  .timeline-year {
+    position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: #555; white-space: nowrap;
+  }
+
+  /* Family tree view */
+  .family-container { display: none; }
+  .family-container.active { display: block; }
+
+  .family-tree { position: relative; min-height: 500px; }
+  .family-branch { margin-bottom: 36px; }
+  .family-branch-label {
+    font-size: 13px; font-weight: 600; color: #888; margin-bottom: 12px;
+    padding-left: 12px; border-left: 3px solid #333;
+  }
+  .family-nodes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding-left: 16px; }
+  .family-node {
+    padding: 10px 16px; border-radius: 10px; border: 1px solid #252830; background: #181b22;
+    cursor: pointer; transition: all 0.25s; text-align: center; min-width: 90px;
+  }
+  .family-node:hover { border-color: #555; transform: translateY(-2px); }
+  .family-node.dimmed { opacity: 0.2; }
+  .family-node-abbr { font-size: 14px; font-weight: 700; color: #fff; }
+  .family-node-year { font-size: 10px; color: #666; margin-top: 2px; }
+  .family-arrow { color: #444; font-size: 18px; }
+  .family-arrow-label { font-size: 9px; color: #555; text-align: center; display: block; }
+
+  /* Scatter / positioning view */
+  .scatter-container { display: none; }
+  .scatter-container.active { display: block; }
+  .scatter-plot {
+    position: relative; width: 100%; height: 520px; background: #14161d;
+    border: 1px solid #222; border-radius: 12px; overflow: hidden;
+  }
+  .scatter-axis-x {
+    position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; color: #555; letter-spacing: 0.5px;
+  }
+  .scatter-axis-y {
+    position: absolute; left: 12px; top: 50%; transform: translateY(-50%) rotate(-90deg);
+    font-size: 11px; color: #555; letter-spacing: 0.5px; white-space: nowrap;
+  }
+  .scatter-quadrant {
+    position: absolute; font-size: 10px; color: #2a2d36; font-weight: 600; text-align: center;
+    line-height: 1.4;
+  }
+  .scatter-midline-h {
+    position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #1e2028;
+  }
+  .scatter-midline-v {
+    position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; background: #1e2028;
+  }
+  .scatter-dot {
+    position: absolute; border-radius: 50%; cursor: pointer; transition: all 0.3s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 700; color: #fff; border: 2px solid;
+  }
+  .scatter-dot:hover { transform: scale(1.3); z-index: 10; }
+  .scatter-dot.dimmed { opacity: 0.2; }
+  .scatter-dot-label {
+    position: absolute; top: 105%; left: 50%; transform: translateX(-50%);
+    font-size: 9px; color: #777; white-space: nowrap; pointer-events: none;
+  }
+
+  /* Right: detail panel */
+  .detail-panel {
+    width: 320px; flex-shrink: 0; background: #181b22; border: 1px solid #252830;
+    border-radius: 14px; padding: 24px; height: fit-content; position: sticky; top: 20px;
+    transition: all 0.3s;
+  }
+  .detail-empty { color: #555; font-size: 13px; text-align: center; padding: 40px 0; }
+  .detail-abbr { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 2px; }
+  .detail-fullname { font-size: 14px; color: #999; margin-bottom: 16px; }
+  .detail-section { margin-bottom: 14px; }
+  .detail-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #555; margin-bottom: 4px; font-weight: 600; }
+  .detail-section-value { font-size: 13px; color: #ccc; line-height: 1.5; }
+  .detail-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px;
+    font-weight: 600; margin-right: 4px; margin-bottom: 4px;
+  }
+
+  /* Legend */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; padding: 12px 40px; max-width: 1400px; margin: 0 auto; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #777; }
+  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* Colors */
+  .c-enum { background: #e06c75; border-color: #e06c75; }
+  .c-faceted { background: #61afef; border-color: #61afef; }
+  .c-hybrid { background: #e5c07b; border-color: #e5c07b; }
+  .c-cultural { background: #c678dd; border-color: #c678dd; }
+  .ct-enum { color: #e06c75; }
+  .ct-faceted { color: #61afef; }
+  .ct-hybrid { color: #e5c07b; }
+  .ct-cultural { color: #c678dd; }
+  .bg-enum { background: rgba(224,108,117,0.15); color: #e06c75; }
+  .bg-faceted { background: rgba(97,175,239,0.15); color: #61afef; }
+  .bg-hybrid { background: rgba(229,192,123,0.15); color: #e5c07b; }
+  .bg-cultural { background: rgba(198,120,221,0.15); color: #c678dd; }
+  .bg-scope-universal { background: rgba(152,195,121,0.12); color: #98c379; }
+  .bg-scope-national { background: rgba(209,154,102,0.12); color: #d19a66; }
+  .bg-scope-domain { background: rgba(86,182,194,0.12); color: #56b6c2; }
+
+  @media (max-width: 900px) {
+    .main { flex-direction: column; }
+    .detail-panel { width: 100%; position: static; }
+    .card { width: calc(50% - 5px); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Classifying the Classifiers</h1>
+  <p>16 library classification systems organized by methodology, lineage, scope, and era. Click any system to explore. Use filters to highlight dimensions.</p>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot c-enum"></div> Enumerative</div>
+  <div class="legend-item"><div class="legend-dot c-faceted"></div> Faceted / Analytico-synthetic</div>
+  <div class="legend-item"><div class="legend-dot c-hybrid"></div> Hybrid</div>
+  <div class="legend-item"><div class="legend-dot c-cultural"></div> Culturally grounded</div>
+</div>
+
+<div class="filter-bar">
+  <div class="filter-group">
+    <span class="filter-label">Scope</span>
+    <button class="filter-btn" data-filter="scope" data-value="all" onclick="toggleFilter(this)">All</button>
+    <button class="filter-btn" data-filter="scope" data-value="universal" onclick="toggleFilter(this)">Universal</button>
+    <button class="filter-btn" data-filter="scope" data-value="national" onclick="toggleFilter(this)">National</button>
+    <button class="filter-btn" data-filter="scope" data-value="domain" onclick="toggleFilter(this)">Domain</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Origin</span>
+    <button class="filter-btn" data-filter="origin" data-value="all" onclick="toggleFilter(this)">All</button>
+    <button class="filter-btn" data-filter="origin" data-value="american" onclick="toggleFilter(this)">American</button>
+    <button class="filter-btn" data-filter="origin" data-value="european" onclick="toggleFilter(this)">European</button>
+    <button class="filter-btn" data-filter="origin" data-value="asian" onclick="toggleFilter(this)">Asian</button>
+    <button class="filter-btn" data-filter="origin" data-value="indigenous" onclick="toggleFilter(this)">Indigenous</button>
+  </div>
+  <div class="filter-group">
+    <span class="filter-label">Era</span>
+    <button class="filter-btn" data-filter="era" data-value="all" onclick="toggleFilter(this)">All</button>
+    <button class="filter-btn" data-filter="era" data-value="wave1" onclick="toggleFilter(this)">1870–1900</button>
+    <button class="filter-btn" data-filter="era" data-value="wave2" onclick="toggleFilter(this)">1900–1950</button>
+    <button class="filter-btn" data-filter="era" data-value="wave3" onclick="toggleFilter(this)">1950+</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="viz-area">
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="switchView('grid', this)">By Methodology</button>
+      <button class="view-tab" onclick="switchView('family', this)">Family Tree</button>
+      <button class="view-tab" onclick="switchView('timeline', this)">Timeline</button>
+      <button class="view-tab" onclick="switchView('scatter', this)">Positioning Map</button>
+    </div>
+
+    <!-- GRID VIEW -->
+    <div id="view-grid" class="grid-container active"></div>
+
+    <!-- FAMILY TREE VIEW -->
+    <div id="view-family" class="family-container"></div>
+
+    <!-- TIMELINE VIEW -->
+    <div id="view-timeline" class="timeline-container"></div>
+
+    <!-- SCATTER VIEW -->
+    <div id="view-scatter" class="scatter-container"></div>
+  </div>
+
+  <div class="detail-panel" id="detailPanel">
+    <div class="detail-empty">Click any system to see details</div>
+  </div>
+</div>
+
+<script>
+const systems = [
+  { abbr: "DDC", name: "Dewey Decimal Classification", year: 1876, method: "enum", scope: "universal", origin: "american", era: "wave1", notation: "Pure numeric", family: "dewey", creator: "Melvil Dewey", country: "USA", desc: "Divides all knowledge into 10 main classes, each subdivided decimally. The most widely used classification system globally — adopted in 200,000+ libraries across 135 countries.", influence: "Parent of UDC, KDC, NDC; influenced CLC", rigidity: 8, flexibility: 3 },
+  { abbr: "UDC", name: "Universal Decimal Classification", year: 1905, method: "hybrid", scope: "universal", origin: "european", era: "wave2", notation: "Numeric + symbols", family: "dewey", creator: "Paul Otlet & Henri La Fontaine", country: "Belgium", desc: "Started as a French translation of DDC, but Otlet grafted on synthetic features — colons, plus signs, and parentheses let you combine topics. A Dewey skeleton with faceted capabilities.", influence: "Derived from DDC; influenced by CC ideas over time", rigidity: 5, flexibility: 7 },
+  { abbr: "LCC", name: "Library of Congress Classification", year: 1897, method: "enum", scope: "universal", origin: "american", era: "wave1", notation: "Alphanumeric", family: "cutter", creator: "James Hanson & Charles Martel", country: "USA", desc: "Uses 21 letter-based main classes. Designed for extremely large collections (Library of Congress holds 170M+ items). Practical and collection-driven rather than theoretically elegant.", influence: "Influenced by Cutter Expansive", rigidity: 7, flexibility: 3 },
+  { abbr: "CC", name: "Colon Classification", year: 1933, method: "faceted", scope: "universal", origin: "asian", era: "wave2", notation: "Mixed (PMEST facets + colons)", family: "ranganathan", creator: "S.R. Ranganathan", country: "India", desc: "The first fully faceted system. Breaks any subject into 5 facets (Personality, Matter, Energy, Space, Time) combined with colons. Revolutionary in theory, complex in practice.", influence: "Inspired BC2, influenced UDC revisions, faceted search", rigidity: 2, flexibility: 9 },
+  { abbr: "BC", name: "Bliss Bibliographic Classification", year: 1940, method: "faceted", scope: "universal", origin: "american", era: "wave2", notation: "Alphanumeric", family: "ranganathan", creator: "Henry Bliss (BC1) / Jack Mills (BC2)", country: "USA → UK", desc: "BC1 (1940) was enumerative. BC2 (1977+) was completely redesigned as the most comprehensive faceted general classification in the Western world. The gold standard for faceted theory.", influence: "Influenced by CC; BC2 is the leading faceted scheme", rigidity: 3, flexibility: 9 },
+  { abbr: "Cutter", name: "Cutter Expansive Classification", year: 1882, method: "enum", scope: "universal", origin: "american", era: "wave1", notation: "Alphanumeric", family: "cutter", creator: "Charles Ammi Cutter", country: "USA", desc: "Designed with 7 levels of detail — small libraries use the brief version, large ones expand. Never completed (Cutter died in 1903), but directly influenced LCC's design.", influence: "Direct ancestor of LCC", rigidity: 7, flexibility: 4 },
+  { abbr: "SuDocs", name: "Superintendent of Documents", year: 1895, method: "enum", scope: "domain", origin: "american", era: "wave1", notation: "Alphanumeric", family: "independent", creator: "Adelaide Hasse", country: "USA", desc: "Unique: organizes by issuing government agency, not by subject. A provenance-based system — if the Dept. of Agriculture publishes it, it goes under 'A' regardless of topic.", influence: "Independent; influenced CODOC", rigidity: 9, flexibility: 1 },
+  { abbr: "CODOC", name: "CODOC Classification", year: 1969, method: "enum", scope: "domain", origin: "american", era: "wave3", notation: "Alphanumeric", family: "independent", creator: "Ontario universities consortium", country: "Canada", desc: "Canadian system for government documents. Like SuDocs, classifies by issuing body (federal, provincial, municipal) rather than subject matter.", influence: "Modeled after SuDocs approach", rigidity: 8, flexibility: 2 },
+  { abbr: "NLM", name: "National Library of Medicine Classification", year: 1951, method: "enum", scope: "domain", origin: "american", era: "wave3", notation: "Alphanumeric", family: "cutter", creator: "National Library of Medicine", country: "USA", desc: "Covers medicine and preclinical sciences. Uses letters QS–QZ and W–WZ that were deliberately left empty in LCC, so the two systems mesh seamlessly.", influence: "Designed to complement LCC", rigidity: 7, flexibility: 3 },
+  { abbr: "CLC", name: "Chinese Library Classification", year: 1975, method: "enum", scope: "national", origin: "asian", era: "wave3", notation: "Alphanumeric", family: "dewey", creator: "National Library of China", country: "China", desc: "The standard classification in Chinese libraries. Uses 22 main classes with Marxism-Leninism as class A. Heavily influenced by DDC structure but adapted for Chinese knowledge organization.", influence: "Influenced by DDC", rigidity: 7, flexibility: 3 },
+  { abbr: "KDC", name: "Korean Decimal Classification", year: 1964, method: "enum", scope: "national", origin: "asian", era: "wave3", notation: "Pure numeric", family: "dewey", creator: "Korean Library Association", country: "South Korea", desc: "Direct adaptation of DDC for Korean libraries. Maintains the 10-class decimal structure but reorganizes for Korean literature, history, and culture.", influence: "Derived from DDC", rigidity: 8, flexibility: 3 },
+  { abbr: "NDC", name: "Nippon Decimal Classification", year: 1929, method: "enum", scope: "national", origin: "asian", era: "wave2", notation: "Pure numeric", family: "dewey", creator: "Mori Kiyoshi", country: "Japan", desc: "Japanese adaptation of DDC. Used in 95%+ of Japanese public libraries. Rearranges Dewey's classes to give prominence to Japanese language, literature, and history.", influence: "Derived from DDC", rigidity: 8, flexibility: 3 },
+  { abbr: "SAB", name: "Swedish Library Classification", year: 1921, method: "enum", scope: "national", origin: "european", era: "wave2", notation: "Alphabetic", family: "independent", creator: "Swedish Library Association", country: "Sweden", desc: "Uses letter codes (A–Ö, following the Swedish alphabet). Simpler and more pragmatic than DDC. Used in Swedish public libraries until a 2010s transition toward DDC.", influence: "Independent Swedish development", rigidity: 6, flexibility: 4 },
+  { abbr: "H-Y", name: "Harvard-Yenching Classification", year: 1927, method: "enum", scope: "national", origin: "asian", era: "wave2", notation: "Numeric", family: "independent", creator: "Harvard-Yenching Institute", country: "USA (for East Asian collections)", desc: "Purpose-built for Chinese, Japanese, and Korean collections in Western libraries. Organizes by traditional East Asian scholarly divisions rather than Western disciplinary lines.", influence: "Independent; for CJK collections in the West", rigidity: 7, flexibility: 3 },
+  { abbr: "Brian Deer", name: "Brian Deer Classification", year: 1974, method: "cultural", scope: "domain", origin: "indigenous", era: "wave3", notation: "Custom", family: "independent", creator: "A. Brian Deer (Kahnawake Mohawk)", country: "Canada", desc: "Built from an Indigenous worldview. Organizes around relationships — community, people, land, animals — rather than Western academic disciplines. Rejects the Western hierarchy of knowledge.", influence: "Pioneered Indigenous classification; influenced FNCC", rigidity: 4, flexibility: 7 },
+  { abbr: "NCSNCL", name: "New Classification Scheme for Chinese Libraries", year: 1929, method: "enum", scope: "national", origin: "asian", era: "wave2", notation: "Numeric", family: "dewey", creator: "Liu Guojun", country: "China", desc: "An earlier Chinese adaptation of DDC, preceding CLC. Used in the Republic of China era and still used in Taiwan. Adapted Dewey's structure for Chinese scholarly traditions.", influence: "Influenced by DDC; predecessor to CLC in mainland", rigidity: 7, flexibility: 3 },
+];
+
+// Active filters
+let filters = { scope: 'all', origin: 'all', era: 'all' };
+let selectedSystem = null;
+
+function matchesFilters(sys) {
+  if (filters.scope !== 'all' && sys.scope !== filters.scope) return false;
+  if (filters.origin !== 'all' && sys.origin !== filters.origin) return false;
+  if (filters.era !== 'all' && sys.era !== filters.era) return false;
+  return true;
+}
+
+function toggleFilter(btn) {
+  const group = btn.dataset.filter;
+  const value = btn.dataset.value;
+  document.querySelectorAll(`.filter-btn[data-filter="${group}"]`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filters[group] = value;
+  applyFilters();
+}
+
+function applyFilters() {
+  // Cards
+  document.querySelectorAll('.card').forEach(card => {
+    const sys = systems.find(s => s.abbr === card.dataset.abbr);
+    card.classList.toggle('dimmed', !matchesFilters(sys));
+  });
+  // Timeline
+  document.querySelectorAll('.timeline-item').forEach(item => {
+    const sys = systems.find(s => s.abbr === item.dataset.abbr);
+    item.classList.toggle('dimmed', !matchesFilters(sys));
+  });
+  // Family
+  document.querySelectorAll('.family-node').forEach(node => {
+    const sys = systems.find(s => s.abbr === node.dataset.abbr);
+    if (sys) node.classList.toggle('dimmed', !matchesFilters(sys));
+  });
+  // Scatter
+  document.querySelectorAll('.scatter-dot').forEach(dot => {
+    const sys = systems.find(s => s.abbr === dot.dataset.abbr);
+    dot.classList.toggle('dimmed', !matchesFilters(sys));
+  });
+}
+
+function selectSystem(abbr) {
+  selectedSystem = abbr;
+  const sys = systems.find(s => s.abbr === abbr);
+  if (!sys) return;
+
+  const methodColors = { enum: 'bg-enum', faceted: 'bg-faceted', hybrid: 'bg-hybrid', cultural: 'bg-cultural' };
+  const methodNames = { enum: 'Enumerative', faceted: 'Faceted', hybrid: 'Hybrid', cultural: 'Cultural' };
+  const scopeNames = { universal: 'Universal', national: 'National', domain: 'Domain-specific' };
+
+  document.getElementById('detailPanel').innerHTML = `
+    <div class="detail-abbr">${sys.abbr}</div>
+    <div class="detail-fullname">${sys.name}</div>
+    <div class="detail-section">
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;">
+        <span class="detail-badge ${methodColors[sys.method]}">${methodNames[sys.method]}</span>
+        <span class="detail-badge bg-scope-${sys.scope}">${scopeNames[sys.scope] || sys.scope}</span>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Year</div>
+      <div class="detail-section-value">${sys.year}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Creator</div>
+      <div class="detail-section-value">${sys.creator}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Country</div>
+      <div class="detail-section-value">${sys.country}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Notation</div>
+      <div class="detail-section-value">${sys.notation}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Description</div>
+      <div class="detail-section-value">${sys.desc}</div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-section-label">Lineage & Influence</div>
+      <div class="detail-section-value">${sys.influence}</div>
+    </div>
+  `;
+
+  // Highlight in all views
+  document.querySelectorAll('.card').forEach(c => c.classList.remove('highlighted'));
+  const card = document.querySelector(`.card[data-abbr="${abbr}"]`);
+  if (card) card.classList.add('highlighted');
+}
+
+function methodClass(m) {
+  return { enum: 'c-enum', faceted: 'c-faceted', hybrid: 'c-hybrid', cultural: 'c-cultural' }[m];
+}
+function methodTextClass(m) {
+  return { enum: 'ct-enum', faceted: 'ct-faceted', hybrid: 'ct-hybrid', cultural: 'ct-cultural' }[m];
+}
+
+// ---- BUILD GRID VIEW ----
+function buildGrid() {
+  const container = document.getElementById('view-grid');
+  const groups = [
+    { method: 'enum', label: 'Enumerative', desc: 'Pre-listed subjects in a fixed schedule' },
+    { method: 'faceted', label: 'Faceted / Analytico-synthetic', desc: 'Combine independent facets on the fly' },
+    { method: 'hybrid', label: 'Hybrid', desc: 'Enumerative base + synthetic capabilities' },
+    { method: 'cultural', label: 'Culturally Grounded', desc: 'Alternative ontological frameworks' },
+  ];
+  let html = '';
+  groups.forEach(g => {
+    const items = systems.filter(s => s.method === g.method);
+    html += `<div class="method-section">
+      <div class="method-header">
+        <div class="method-dot ${methodClass(g.method)}"></div>
+        <div class="method-title">${g.label}</div>
+        <div class="method-desc">${g.desc}</div>
+      </div>
+      <div class="cards-row">`;
+    items.forEach(s => {
+      const scopeLabel = { universal: 'Universal', national: 'National', domain: 'Domain' }[s.scope] || s.scope;
+      html += `<div class="card" data-abbr="${s.abbr}" onclick="selectSystem('${s.abbr}')">
+        <div class="card-method-stripe ${methodClass(s.method)}"></div>
+        <div class="card-abbr">${s.abbr}</div>
+        <div class="card-name">${s.name}</div>
+        <div class="card-tags">
+          <span class="card-tag">${s.year}</span>
+          <span class="card-tag">${s.country}</span>
+          <span class="card-tag">${scopeLabel}</span>
+        </div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+// ---- BUILD FAMILY TREE VIEW ----
+function buildFamily() {
+  const container = document.getElementById('view-family');
+  const families = [
+    { label: 'The Dewey Family — Decimal tradition (1876 →)',
+      nodes: [
+        { abbr: 'DDC', arrow: null },
+        { abbr: 'UDC', arrow: '→ spawned' },
+        { abbr: 'NDC', arrow: '→ adapted' },
+        { abbr: 'KDC', arrow: '→ adapted' },
+        { abbr: 'CLC', arrow: '→ influenced' },
+        { abbr: 'NCSNCL', arrow: '→ adapted' },
+      ]},
+    { label: 'The Cutter → Library of Congress Line',
+      nodes: [
+        { abbr: 'Cutter', arrow: null },
+        { abbr: 'LCC', arrow: '→ influenced' },
+        { abbr: 'NLM', arrow: '→ complements' },
+      ]},
+    { label: 'The Ranganathan Line — Faceted revolution (1933 →)',
+      nodes: [
+        { abbr: 'CC', arrow: null },
+        { abbr: 'BC', arrow: '→ inspired' },
+      ]},
+    { label: 'Government Document Systems',
+      nodes: [
+        { abbr: 'SuDocs', arrow: null },
+        { abbr: 'CODOC', arrow: '→ modeled after' },
+      ]},
+    { label: 'Independent Systems',
+      nodes: [
+        { abbr: 'SAB', arrow: null },
+        { abbr: 'H-Y', arrow: null },
+        { abbr: 'Brian Deer', arrow: null },
+      ]},
+  ];
+
+  let html = '<div class="family-tree">';
+  families.forEach(fam => {
+    html += `<div class="family-branch">
+      <div class="family-branch-label">${fam.label}</div>
+      <div class="family-nodes">`;
+    fam.nodes.forEach((n, i) => {
+      const sys = systems.find(s => s.abbr === n.abbr);
+      if (n.arrow && i > 0) {
+        html += `<div class="family-arrow"><span class="family-arrow-label">${n.arrow}</span></div>`;
+      }
+      html += `<div class="family-node" data-abbr="${n.abbr}" onclick="selectSystem('${n.abbr}')" style="border-color:${getMethodBorderColor(sys.method)}">
+        <div class="family-node-abbr">${n.abbr}</div>
+        <div class="family-node-year">${sys.year}</div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function getMethodBorderColor(m) {
+  return { enum: '#e06c75', faceted: '#61afef', hybrid: '#e5c07b', cultural: '#c678dd' }[m];
+}
+
+// ---- BUILD TIMELINE VIEW ----
+function buildTimeline() {
+  const container = document.getElementById('view-timeline');
+  const minYear = 1870;
+  const maxYear = 1985;
+  const range = maxYear - minYear;
+
+  // Sort by year
+  const sorted = [...systems].sort((a, b) => a.year - b.year);
+
+  // Assign vertical positions to avoid overlap
+  const positions = [];
+  const rows = [];
+
+  sorted.forEach(sys => {
+    const xPct = ((sys.year - minYear) / range) * 90 + 5;
+    let row = 0;
+    for (let r = 0; r < 8; r++) {
+      const conflict = positions.find(p => p.row === r && Math.abs(p.x - xPct) < 7);
+      if (!conflict) { row = r; break; }
+      row = r + 1;
+    }
+    positions.push({ abbr: sys.abbr, x: xPct, row, method: sys.method, year: sys.year });
+    rows.push(row);
+  });
+
+  const maxRow = Math.max(...rows);
+  let html = `
+    <div style="position:relative;height:${Math.max(420, maxRow * 62 + 120)}px;margin:0;">
+      <div style="position:absolute;top:60px;left:5%;right:5%;height:1px;background:#252830;"></div>
+      <div style="position:absolute;top:52px;left:5%;font-size:10px;color:#555;">1876</div>
+      <div style="position:absolute;top:52px;left:30%;font-size:10px;color:#555;">1905</div>
+      <div style="position:absolute;top:52px;left:55%;font-size:10px;color:#555;">1933</div>
+      <div style="position:absolute;top:52px;left:80%;font-size:10px;color:#555;">1975</div>
+      <div style="position:absolute;top:30px;left:15%;font-size:10px;color:#333;letter-spacing:1px;">FIRST WAVE</div>
+      <div style="position:absolute;top:30px;left:45%;font-size:10px;color:#333;letter-spacing:1px;">SECOND WAVE</div>
+      <div style="position:absolute;top:30px;left:75%;font-size:10px;color:#333;letter-spacing:1px;">THIRD WAVE</div>
+  `;
+
+  positions.forEach(p => {
+    const sys = systems.find(s => s.abbr === p.abbr);
+    const top = 80 + p.row * 58;
+    html += `<div class="timeline-item" data-abbr="${p.abbr}" style="left:${p.x}%;top:${top}px;" onclick="selectSystem('${p.abbr}')">
+      <div class="timeline-year">${p.year}</div>
+      <div class="timeline-node ${methodClass(p.method)}" style="background:#181b22;">
+        ${p.abbr.length <= 4 ? p.abbr : p.abbr.substring(0, 3)}
+      </div>
+      <div class="timeline-label">${sys.name.length > 22 ? sys.name.substring(0, 20) + '…' : sys.name}</div>
+    </div>`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ---- BUILD SCATTER VIEW ----
+function buildScatter() {
+  const container = document.getElementById('view-scatter');
+  let html = `<div class="scatter-plot">
+    <div class="scatter-midline-h"></div>
+    <div class="scatter-midline-v"></div>
+    <div class="scatter-axis-x">Structure & Rigidity →</div>
+    <div class="scatter-axis-y">Flexibility & Synthesis →</div>
+    <div class="scatter-quadrant" style="top:15%;left:15%;">Flexible<br>Synthetic</div>
+    <div class="scatter-quadrant" style="top:15%;right:15%;">Structured<br>Synthetic</div>
+    <div class="scatter-quadrant" style="bottom:15%;left:15%;">Flexible<br>Fixed</div>
+    <div class="scatter-quadrant" style="bottom:15%;right:15%;">Structured<br>Fixed</div>
+  `;
+
+  // Add some jitter to overlapping items
+  const placed = [];
+  systems.forEach(sys => {
+    let x = (sys.rigidity / 10) * 80 + 10;
+    let y = 90 - (sys.flexibility / 10) * 80;
+
+    // Jitter if overlapping
+    for (const p of placed) {
+      if (Math.abs(p.x - x) < 5 && Math.abs(p.y - y) < 5) {
+        x += (Math.random() - 0.5) * 8;
+        y += (Math.random() - 0.5) * 8;
+      }
+    }
+    placed.push({ x, y });
+
+    const size = sys.scope === 'universal' ? 44 : sys.scope === 'national' ? 36 : 30;
+    html += `<div class="scatter-dot ${methodClass(sys.method)}" data-abbr="${sys.abbr}"
+      style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;margin-left:-${size/2}px;margin-top:-${size/2}px;"
+      onclick="selectSystem('${sys.abbr}')">
+      ${sys.abbr.length <= 4 ? sys.abbr : sys.abbr.substring(0, 3)}
+      <div class="scatter-dot-label">${sys.abbr}</div>
+    </div>`;
+  });
+
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ---- VIEW SWITCHING ----
+function switchView(view, btn) {
+  document.querySelectorAll('.view-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['grid', 'family', 'timeline', 'scatter'].forEach(v => {
+    document.getElementById('view-' + v).classList.toggle('active', v === view);
+  });
+}
+
+// ---- INIT ----
+buildGrid();
+buildFamily();
+buildTimeline();
+buildScatter();
+
+// Set default "All" filters active
+document.querySelectorAll('.filter-btn[data-value="all"]').forEach(b => b.classList.add('active'));
+</script>
+</body>
+</html>
