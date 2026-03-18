@@ -1,0 +1,6 @@
+# Add your LLM and vector DB dependencies here.
+# Examples:
+#   openai>=1.0
+#   anthropic>=0.30
+#   chromadb>=0.4
+#   sentence-transformers>=2.0

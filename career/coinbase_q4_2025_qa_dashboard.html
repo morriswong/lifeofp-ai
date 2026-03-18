@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coinbase Q4 2025 — Analyst Q&A Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --blue: #0052FF;
+            --blue-dark: #050F22;
+            --blue-mid: #0a2266;
+            --green: #05B169;
+            --orange: #FFA500;
+            --red: #FF4949;
+            --purple: #7048E8;
+            --bg: #EEF3FF;
+            --card: #ffffff;
+            --text: #0A0B0D;
+            --muted: #5B616E;
+            --gap: 16px;
+            --r: 12px;
+            --shadow: 0 2px 10px rgba(0,82,255,0.09);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            font-size: 14px;
+        }
+        .wrap { max-width: 1400px; margin: 0 auto; padding: var(--gap); }
+
+        /* ── HEADER ── */
+        .hdr {
+            background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+            color: #fff;
+            padding: 26px 30px;
+            border-radius: var(--r);
+            margin-bottom: var(--gap);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .hdr h1 { font-size: 21px; font-weight: 800; margin-bottom: 4px; }
+        .hdr .sub { font-size: 13px; color: rgba(255,255,255,.6); }
+        .badges { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .badge {
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.2);
+            color: #fff;
+            padding: 5px 13px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* ── FILTERS ── */
+        .fbar {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 13px 20px;
+            margin-bottom: var(--gap);
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: var(--shadow);
+        }
+        .fbar label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+        .fbar select, .fbar input[type="text"] {
+            padding: 7px 11px;
+            border: 1px solid #d8dde8;
+            border-radius: 8px;
+            font-size: 13px;
+            color: var(--text);
+            background: #fff;
+            outline: none;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .fbar select:focus, .fbar input:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(0,82,255,.1);
+        }
+        .btn-reset {
+            padding: 7px 15px;
+            background: var(--blue);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-reset:hover { background: #0042cc; }
+        #results-count { margin-left: auto; font-size: 12px; color: var(--muted); }
+
+        /* ── KPI CARDS ── */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--gap);
+            margin-bottom: var(--gap);
+        }
+        .kpi {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 22px 24px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--blue);
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi.green  { border-left-color: var(--green); }
+        .kpi.orange { border-left-color: var(--orange); }
+        .kpi.purple { border-left-color: var(--purple); }
+        .kpi-icon { font-size: 22px; margin-bottom: 10px; }
+        .kpi-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; font-weight: 700; margin-bottom: 5px; }
+        .kpi-val { font-size: 32px; font-weight: 800; margin-bottom: 3px; }
+        .kpi-note { font-size: 11px; color: var(--muted); }
+
+        /* ── CHART ROWS ── */
+        .crow { display: grid; gap: var(--gap); margin-bottom: var(--gap); }
+        .crow.c2 { grid-template-columns: 1fr 1fr; }
+        .crow.c13 { grid-template-columns: 1fr 2fr; }
+        .cbox {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+        }
+        .cbox-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+        .cbox-title { font-size: 14px; font-weight: 700; }
+        .cbox-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+        .ctag {
+            font-size: 11px;
+            background: #EEF2FF;
+            color: var(--blue);
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        canvas { max-height: 280px; }
+
+        /* ── INSIGHT CARDS ── */
+        .irow { display: grid; grid-template-columns: repeat(3,1fr); gap: var(--gap); margin-bottom: var(--gap); }
+        .icard { background: var(--card); border-radius: var(--r); padding: 18px 20px; box-shadow: var(--shadow); }
+        .ititle {
+            font-size: 13px; font-weight: 700;
+            display: flex; align-items: center; gap: 7px;
+            margin-bottom: 12px;
+        }
+        .idot { width: 9px; height: 9px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+        .idot.g { background: var(--green); }
+        .idot.o { background: var(--orange); }
+        .ilist { list-style: none; }
+        .ilist li {
+            font-size: 12px; color: var(--muted);
+            padding: 6px 0;
+            border-bottom: 1px solid #f2f4f8;
+            display: flex; gap: 8px; align-items: flex-start;
+        }
+        .ilist li:last-child { border-bottom: none; }
+        .ilist li::before { content: '→'; color: var(--blue); flex-shrink: 0; }
+
+        /* ── TABLE ── */
+        .tsec {
+            background: var(--card);
+            border-radius: var(--r);
+            padding: 20px 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: var(--gap);
+            overflow-x: auto;
+        }
+        .thdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+        .ttitle { font-size: 14px; font-weight: 700; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead th {
+            text-align: left; padding: 10px 13px;
+            border-bottom: 2px solid #eef0f4;
+            color: var(--muted); font-weight: 700;
+            font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+            white-space: nowrap; cursor: pointer; user-select: none;
+        }
+        thead th:hover { color: var(--blue); }
+        tbody td { padding: 11px 13px; border-bottom: 1px solid #f4f6fb; vertical-align: top; }
+        tbody tr:hover { background: #f6f9ff; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .chip {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .chip-Capital  { background: #EEF2FF; color: #3B5BFF; }
+        .chip-International { background: #F0FFF4; color: #007A52; }
+        .chip-Revenue  { background: #FFF5E4; color: #B35900; }
+        .chip-Products { background: #F3F0FF; color: #6030D0; }
+        .chip-Regulatory { background: #FFF0F3; color: #C0202A; }
+        .chip-Financial { background: #E8F5E9; color: #1B5E20; }
+        .chip-Metrics  { background: #E3F2FD; color: #1565C0; }
+
+        .sdot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; }
+        .sdot-Positive { background: var(--green); }
+        .sdot-Negative { background: var(--red); }
+        .sdot-Neutral  { background: var(--orange); }
+
+        .aname { font-weight: 600; font-size: 13px; }
+        .afirm { font-size: 11px; color: var(--muted); }
+
+        /* ── FOOTER ── */
+        .foot { text-align: center; font-size: 12px; color: var(--muted); padding: 14px; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 960px) {
+            .kpi-row { grid-template-columns: repeat(2,1fr); }
+            .crow.c2, .crow.c13 { grid-template-columns: 1fr; }
+            .irow { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 500px) {
+            .kpi-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- HEADER -->
+    <header class="hdr">
+        <div>
+            <h1>Coinbase Global — Q4 2025 Analyst Q&amp;A</h1>
+            <div class="sub">Fourth Quarter &amp; Full Year 2025 Earnings · February 12, 2026 · Alesia Haas, CFO</div>
+        </div>
+        <div class="badges">
+            <span class="badge">📅 Feb 12, 2026</span>
+            <span class="badge">9 Analysts</span>
+            <span class="badge">16 Questions</span>
+            <span class="badge">7 Topics</span>
+        </div>
+    </header>
+
+    <!-- FILTERS -->
+    <div class="fbar">
+        <label>Filter:</label>
+        <select id="f-topic" onchange="applyFilters()">
+            <option value="all">All Topics</option>
+            <option value="Capital Allocation">Capital Allocation</option>
+            <option value="International">International</option>
+            <option value="Revenue">Revenue</option>
+            <option value="Products">Products</option>
+            <option value="Regulatory">Regulatory</option>
+            <option value="Financial Health">Financial Health</option>
+            <option value="Metrics">Metrics</option>
+        </select>
+        <select id="f-firm" onchange="applyFilters()">
+            <option value="all">All Firms</option>
+            <option value="Canaccord Genuity">Canaccord Genuity</option>
+            <option value="Rosenblatt Securities">Rosenblatt Securities</option>
+            <option value="Deutsche Bank">Deutsche Bank</option>
+            <option value="KeyBanc Capital Markets">KeyBanc Capital Markets</option>
+            <option value="Citi">Citi</option>
+            <option value="William Blair">William Blair</option>
+            <option value="Needham & Company">Needham &amp; Company</option>
+            <option value="Barclays">Barclays</option>
+            <option value="Citizens JMP">Citizens JMP</option>
+        </select>
+        <select id="f-sentiment" onchange="applyFilters()">
+            <option value="all">All Sentiments</option>
+            <option value="Positive">Positive</option>
+            <option value="Neutral">Neutral</option>
+            <option value="Negative">Negative</option>
+        </select>
+        <button class="btn-reset" onclick="resetFilters()">Reset</button>
+        <input type="text" id="f-search" placeholder="🔍  Search questions &amp; insights…" oninput="applyFilters()" style="width:230px;">
+        <span id="results-count">Showing 16 of 16</span>
+    </div>
+
+    <!-- KPIs -->
+    <section class="kpi-row">
+        <div class="kpi">
+            <div class="kpi-icon">₿</div>
+            <div class="kpi-lbl">Q4 Crypto Investment</div>
+            <div class="kpi-val">$39M</div>
+            <div class="kpi-note">Weekly DCA · 95%+ allocated to Bitcoin</div>
+        </div>
+        <div class="kpi green">
+            <div class="kpi-icon">🔄</div>
+            <div class="kpi-lbl">Buyback Capacity</div>
+            <div class="kpi-val">$2.3B</div>
+            <div class="kpi-note">Available as of Feb 10, 2026</div>
+        </div>
+        <div class="kpi orange">
+            <div class="kpi-icon">🌐</div>
+            <div class="kpi-lbl">International Revenue</div>
+            <div class="kpi-val">~18%</div>
+            <div class="kpi-note">High-teens · Stable for several years</div>
+        </div>
+        <div class="kpi purple">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-lbl">BTC Holdings Growth</div>
+            <div class="kpi-val">2×</div>
+            <div class="kpi-note">Native units doubled year-over-year</div>
+        </div>
+    </section>
+
+    <!-- ROW 1: Capital Allocation + Buyback -->
+    <div class="crow c2">
+        <div class="cbox">
+            <div class="cbox-hdr">
+                <div>
+                    <div class="cbox-title">Crypto Investment Portfolio Mix</div>
+                    <div class="cbox-sub">Allocation of quarterly operating income to crypto assets</div>
+                </div>
+                <span class="ctag">Q4 2025</span>
+            </div>
+            <canvas id="capitalChart"></canvas>
+        </div>
+        <div class="cbox">
+            <div class="cbox-hdr">
+                <div>
+                    <div class="cbox-title">Share Buyback Program — Utilization</div>
+                    <div class="cbox-sub">Prior $2B authorization + new $2B board authorization</div>
+                </div>
+                <span class="ctag">As of Feb 10, 2026</span>
+            </div>
+            <canvas id="buybackChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ROW 2: Topic Distribution + 2026 Priorities -->
+    <div class="crow c2">
+        <div class="cbox">
+            <div class="cbox-hdr">
+                <div>
+                    <div class="cbox-title">Q&amp;A Coverage by Topic</div>
+                    <div class="cbox-sub">Distribution of analyst questions across themes</div>
+                </div>
+                <span class="ctag" id="topic-tag">16 Questions</span>
+            </div>
+            <canvas id="topicChart"></canvas>
+        </div>
+        <div class="cbox">
+            <div class="cbox-hdr">
+                <div>
+                    <div class="cbox-title">2026 Strategic Priorities</div>
+                    <div class="cbox-sub">Topics mentioned or emphasized during the call</div>
+                </div>
+                <span class="ctag">Management Guidance</span>
+            </div>
+            <canvas id="prioritiesChart"></canvas>
+        </div>
+    </div>
+
+    <!-- ROW 3: Sentiment + Revenue S&S -->
+    <div class="crow c2">
+        <div class="cbox">
+            <div class="cbox-hdr">
+                <div>
+                    <div class="cbox-title">Response Sentiment by Topic</div>
+                    <div class="cbox-sub">Tone of CFO responses across coverage areas</div>
+                </div>
+                <span class="ctag">Analyst Assessment</span>
+            </div>
+            <canvas id="sentimentChart"></canvas>
+        </div>
+        <div class="cbox">
+            <div class="cbox-hdr">
+                <div>
+                    <div class="cbox-title">Subscription &amp; Services — Revenue Hierarchy</div>
+                    <div class="cbox-sub">Relative composition of S&amp;S revenue as disclosed on call</div>
+                </div>
+                <span class="ctag">Qualitative</span>
+            </div>
+            <canvas id="ssChart"></canvas>
+        </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="irow">
+        <div class="icard">
+            <div class="ititle"><span class="idot"></span>Capital &amp; Financial Highlights</div>
+            <ul class="ilist">
+                <li>Weekly DCA into crypto; 95%+ of dollars into Bitcoin specifically</li>
+                <li>$2.3B buyback capacity; focused on offsetting SBC dilution + opportunistic</li>
+                <li>Committed to adj. EBITDA positive in any market environment</li>
+                <li>Q1 crypto investment to be "modestly" above Q4's $39M level</li>
+            </ul>
+        </div>
+        <div class="icard">
+            <div class="ititle"><span class="idot g"></span>Growth &amp; International</div>
+            <ul class="ilist">
+                <li>Europe: MiCA license secured; all customers migrated to Luxembourg</li>
+                <li>India: 2025 was fundamentals; 2026 focus on revenue &amp; growth</li>
+                <li>Prediction markets live (2 weeks); incremental to existing users so far</li>
+                <li>Base operating in 100+ markets; millisecond sequencer latency achieved</li>
+            </ul>
+        </div>
+        <div class="icard">
+            <div class="ititle"><span class="idot o"></span>Revenue &amp; Product Dynamics</div>
+            <ul class="ilist">
+                <li>Staking declined: lower ETH/SOL prices + lower protocol reward rates</li>
+                <li>Take rate compressed: mix shift to Advanced + CB1 subscription trading</li>
+                <li>CB1 subscribers are stickiest: trade, stake, use card, hold USDC</li>
+                <li>USDC monetized via NIM, Base sequencer fees, and new payments APIs</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Q&A TABLE -->
+    <div class="tsec">
+        <div class="thdr">
+            <div class="ttitle">Full Q&amp;A Transcript Summary — All 16 Questions</div>
+        </div>
+        <div id="tbl-wrap"></div>
+    </div>
+
+    <footer class="foot">
+        Coinbase Global, Inc. · Q4 &amp; Full Year 2025 Analyst Q&amp;A · February 12, 2026 · Based on public earnings call transcript · Dashboard generated February 27, 2026
+    </footer>
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+const QA = [
+    {
+        analyst: "Joseph Vafi", firm: "Canaccord Genuity",
+        topic: "Capital Allocation", subtopic: "Bitcoin Strategy",
+        question: "Bitcoin acquisition approach and exposure to other asset classes",
+        insight: "Weekly DCA; 95%+ into BTC; $39M deployed in Q4; Q1 modestly higher; doubled native units YoY. Not driven by market signals.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Joseph Vafi", firm: "Canaccord Genuity",
+        topic: "Capital Allocation", subtopic: "Share Buyback",
+        question: "Is the buyback separate from Bitcoin purchases?",
+        insight: "Fully separate programs. $2B new authorization + ~$300M remaining from prior authorization = $2.3B available as of Feb 10. Focus on SBC dilution offset and opportunistic buying.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Chris Brendler", firm: "Rosenblatt Securities",
+        topic: "International", subtopic: "Revenue Mix",
+        question: "International revenue growth and 2026/27 outlook",
+        insight: "High teens % of revenue; stable for several years; no single country material enough to break out. MiCA license obtained; all EU customers migrated to Luxembourg. India is the next growth market.",
+        sentiment: "Neutral"
+    },
+    {
+        analyst: "Chris Brendler", firm: "Rosenblatt Securities",
+        topic: "International", subtopic: "Product Strategy",
+        question: "Product focus for international expansion",
+        insight: "Primarily retail in go-deep markets. Base is international in 100+ markets and can grow faster. Expanding tradable assets (e.g., prediction markets, equities) to non-US customers is a priority.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Brian Bedell", firm: "Deutsche Bank",
+        topic: "Revenue", subtopic: "Staking Yield",
+        question: "Why did staking yield decline in Q4?",
+        insight: "Two drivers: (1) lower ETH and SOL prices reduced staking revenue, and (2) protocol reward rates declined as networks mature with more participants.",
+        sentiment: "Negative"
+    },
+    {
+        analyst: "Brian Bedell", firm: "Deutsche Bank",
+        topic: "Products", subtopic: "Tokenization",
+        question: "Update on the Coinbase Tokenize initiative",
+        insight: "2026 priority. Echo acquisition (Q4) connects builders with users. Combined with LiquiFi → Coinbase Token Manager: supports token issuance via listings, custody, staking, and trading. Asset tokenization (equities, bonds) awaits regulatory clarity.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Alex Markgraff", firm: "KeyBanc Capital Markets",
+        topic: "Regulatory", subtopic: "Market Structure Legislation",
+        question: "How dependent is the 12–24 month product roadmap on regulatory unlocks?",
+        insight: "Not materially dependent on regulatory unlocks for 2026 plans. Regulatory unlocks would be additive, not required. Derivatives, spot trading, equities, prediction markets already in market.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Alex Markgraff", firm: "KeyBanc Capital Markets",
+        topic: "Products", subtopic: "Payments Disclosure",
+        question: "Will Coinbase add payments-specific metrics or disclosures in 2026?",
+        insight: "Will break out disclosures when payments becomes material. Qualitative updates provided until milestones are hit. Payments is a key 2026 priority.",
+        sentiment: "Neutral"
+    },
+    {
+        analyst: "Pete Christensen", firm: "Citi",
+        topic: "Revenue", subtopic: "Take Rate Compression",
+        question: "Take rate compression vs. subscriber growth — is this revenue destructive?",
+        insight: "Mix shift toward Advanced trading + incremental Coinbase One trading both drove lower effective take rate. Unit economics remain positive. CB1 customers monetize across staking, card, USDC — evaluated on aggregate profitability.",
+        sentiment: "Neutral"
+    },
+    {
+        analyst: "Pete Christensen", firm: "Citi",
+        topic: "Metrics", subtopic: "MTU Definition",
+        question: "Are Coinbase One subscribers counted in the MTU metric?",
+        insight: "Yes — CB1 subscribers are included in Monthly Transacting Users (MTUs).",
+        sentiment: "Neutral"
+    },
+    {
+        analyst: "Andrew Jeffrey", firm: "William Blair",
+        topic: "Revenue", subtopic: "USDC Velocity",
+        question: "USDC velocity acceleration — does it accrue to Coinbase economics?",
+        insight: "Depends on where it occurs. USDC on Base → sequencer fees. USDC via payments APIs → product monetization. USDC held on platform → NIM from Circle relationship. Multiple monetization paths exist.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Andrew Jeffrey", firm: "William Blair",
+        topic: "Regulatory", subtopic: "Stablecoin Rewards",
+        question: "Is stablecoin rewards restriction a bright red line in supporting legislation?",
+        insight: "Seeking a win-win-win for the White House, banks, and crypto. Strongly supports customer reward programs and is actively engaged in the legislative process to find common ground.",
+        sentiment: "Neutral"
+    },
+    {
+        analyst: "John Todaro", firm: "Needham & Company",
+        topic: "Financial Health", subtopic: "Expense Management",
+        question: "How aggressive would Coinbase be on expenses in a crypto winter?",
+        insight: "Committed to adjusted EBITDA positive in any market environment. Started 2026 flat on expenses. Revenue diversification provides cushion. Will dynamically revisit expenses if material revenue degradation occurs.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "John Todaro", firm: "Needham & Company",
+        topic: "Products", subtopic: "Prediction Markets",
+        question: "Will prediction markets attract new customers or just existing users?",
+        insight: "Only 2 weeks live; no marketing yet turned on. Appears incremental to existing users so far. Expects both cross-sell and new user potential over time. Too early for definitive conclusions.",
+        sentiment: "Positive"
+    },
+    {
+        analyst: "Ben Budish", firm: "Barclays",
+        topic: "Revenue", subtopic: "S&S Breakdown",
+        question: "Help understand interest income and 'other' S&S components for Q1 guidance",
+        insight: "Interest income = lending + custodial balances (can estimate from balance sheet). CB1 subscriptions are the largest component of 'Other S&S'. Custody fees are second largest. No component-level Q1 guidance provided.",
+        sentiment: "Neutral"
+    },
+    {
+        analyst: "Devin Ryan", firm: "Citizens JMP",
+        topic: "Products", subtopic: "Base Blockchain",
+        question: "Sequencer fee scaling strategy and potential Base token",
+        insight: "Sequencer fees at millisecond latency — the right level for transaction adoption. Will scale to meet demand, not ahead of it. Base token is being explored; no new updates to share at this time.",
+        sentiment: "Positive"
+    }
+];
+
+// ─── COLORS ────────────────────────────────────────────────────────────────
+const TOPIC_COLORS = {
+    'Capital Allocation': '#3B5BFF',
+    'International':      '#007A52',
+    'Revenue':            '#CC6600',
+    'Products':           '#6030D0',
+    'Regulatory':         '#C0202A',
+    'Financial Health':   '#1B5E20',
+    'Metrics':            '#1565C0',
+};
+
+// ─── CHART: Capital Allocation ─────────────────────────────────────────────
+(function() {
+    const ctx = document.getElementById('capitalChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Bitcoin (BTC)', 'Other Top-5 Assets'],
+            datasets: [{
+                data: [95, 5],
+                backgroundColor: ['#F7931A', '#0052FF'],
+                borderColor: '#fff',
+                borderWidth: 4,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '65%',
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 22 } },
+                tooltip: { callbacks: { label: c => ` ${c.label}: ${c.parsed}% of investment` } }
+            }
+        }
+    });
+})();
+
+// ─── CHART: Buyback Utilization ────────────────────────────────────────────
+(function() {
+    const ctx = document.getElementById('buybackChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Original $2B (Board Auth. Prior)', 'New $2B (Board Auth. Feb 2026)'],
+            datasets: [
+                {
+                    label: 'Utilized ($M)',
+                    data: [1700, 0],
+                    backgroundColor: '#0052FF',
+                    borderRadius: 6,
+                    borderSkipped: false
+                },
+                {
+                    label: 'Available ($M)',
+                    data: [300, 2000],
+                    backgroundColor: '#BFCFFF',
+                    borderRadius: 6,
+                    borderSkipped: false
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } },
+                tooltip: { callbacks: { label: c => ` ${c.dataset.label}: $${c.parsed.x.toLocaleString()}M` } }
+            },
+            scales: {
+                x: {
+                    stacked: true, beginAtZero: true, max: 2100,
+                    ticks: { callback: v => `$${v}M` },
+                    grid: { color: '#f0f2f8' }
+                },
+                y: { stacked: true, grid: { display: false } }
+            }
+        }
+    });
+})();
+
+// ─── CHART: Topic Distribution ─────────────────────────────────────────────
+let topicChart = null;
+
+function buildTopicChart(data) {
+    const counts = {};
+    data.forEach(d => { counts[d.topic] = (counts[d.topic] || 0) + 1; });
+    const labels = Object.keys(counts);
+    const values = labels.map(l => counts[l]);
+    const colors = labels.map(l => TOPIC_COLORS[l] || '#888');
+
+    document.getElementById('topic-tag').textContent = `${data.length} Question${data.length !== 1 ? 's' : ''}`;
+
+    if (topicChart) {
+        topicChart.data.labels = labels;
+        topicChart.data.datasets[0].data = values;
+        topicChart.data.datasets[0].backgroundColor = colors;
+        topicChart.update('none');
+        return;
+    }
+
+    const ctx = document.getElementById('topicChart').getContext('2d');
+    topicChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderColor: '#fff',
+                borderWidth: 3,
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, cutout: '55%',
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { usePointStyle: true, padding: 14, font: { size: 11 } }
+                },
+                tooltip: { callbacks: { label: c => ` ${c.label}: ${c.parsed} question${c.parsed > 1 ? 's' : ''}` } }
+            }
+        }
+    });
+}
+
+// ─── CHART: 2026 Priorities ────────────────────────────────────────────────
+(function() {
+    const ctx = document.getElementById('prioritiesChart').getContext('2d');
+    const items = [
+        { l: 'Derivatives Growth',     v: 2, c: '#CC6600' },
+        { l: 'Coinbase Tokenize',      v: 3, c: '#C0202A' },
+        { l: 'Prediction Markets',     v: 3, c: '#6030D0' },
+        { l: 'USDC / Stablecoins',     v: 4, c: '#F7931A' },
+        { l: 'Base Blockchain',        v: 4, c: '#1652F0' },
+        { l: 'Payments Platform',      v: 4, c: '#0052FF' },
+        { l: 'International Expansion',v: 5, c: '#007A52' },
+    ];
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: items.map(i => i.l),
+            datasets: [{
+                label: 'Mention Count',
+                data: items.map(i => i.v),
+                backgroundColor: items.map(i => i.c + 'CC'),
+                borderColor: items.map(i => i.c),
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: c => ` Mentioned ${c.parsed.x} time${c.parsed.x > 1 ? 's' : ''}` } }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0f2f8' },
+                    title: { display: true, text: 'Number of Mentions', font: { size: 11 }, color: '#888' }
+                },
+                y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+            }
+        }
+    });
+})();
+
+// ─── CHART: Sentiment by Topic ─────────────────────────────────────────────
+(function() {
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    const topics = ['Capital Allocation','International','Revenue','Products','Regulatory','Financial Health','Metrics'];
+    const pos = [], neu = [], neg = [];
+    topics.forEach(t => {
+        const rows = QA.filter(r => r.topic === t);
+        pos.push(rows.filter(r => r.sentiment === 'Positive').length);
+        neu.push(rows.filter(r => r.sentiment === 'Neutral').length);
+        neg.push(rows.filter(r => r.sentiment === 'Negative').length);
+    });
+    const shortTopics = topics.map(t => t.replace('Capital Allocation','Cap. Alloc.').replace('Financial Health','Fin. Health'));
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: shortTopics,
+            datasets: [
+                { label: 'Positive', data: pos, backgroundColor: '#05B169CC', borderRadius: 4 },
+                { label: 'Neutral',  data: neu, backgroundColor: '#FFA500CC', borderRadius: 4 },
+                { label: 'Negative', data: neg, backgroundColor: '#FF4949CC', borderRadius: 4 },
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 18 } },
+                tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+                x: { stacked: true, grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f0f2f8' } }
+            }
+        }
+    });
+})();
+
+// ─── CHART: S&S Revenue Hierarchy ─────────────────────────────────────────
+(function() {
+    const ctx = document.getElementById('ssChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['CB1 Subscriptions', 'Custody Fees', 'Interest Income\n(Lending)', 'Interest Income\n(Custodial)', 'Other / Newer\nProducts'],
+            datasets: [{
+                label: 'Relative Contribution (Qualitative)',
+                data: [100, 70, 50, 40, 20],
+                backgroundColor: ['#0052FFCC', '#1652F0CC', '#4A7AFFCC', '#7A9FFFCC', '#B0C4FFCC'],
+                borderColor: ['#0052FF','#1652F0','#4A7AFF','#7A9FFF','#B0C4FF'],
+                borderWidth: 1,
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: c => ` Relative size: ${c.parsed.y === 100 ? 'Largest' : c.parsed.y >= 60 ? 'Second largest' : c.parsed.y >= 40 ? 'Mid-tier' : 'Smaller'}`
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+                y: {
+                    beginAtZero: true, max: 115,
+                    ticks: { display: false },
+                    title: { display: true, text: 'Relative Size →', font: { size: 10 }, color: '#888' }
+                }
+            }
+        }
+    });
+})();
+
+// ─── TABLE ─────────────────────────────────────────────────────────────────
+function topicChipClass(topic) {
+    const map = {
+        'Capital Allocation': 'chip-Capital',
+        'International': 'chip-International',
+        'Revenue': 'chip-Revenue',
+        'Products': 'chip-Products',
+        'Regulatory': 'chip-Regulatory',
+        'Financial Health': 'chip-Financial',
+        'Metrics': 'chip-Metrics',
+    };
+    return map[topic] || '';
+}
+
+function renderTable(data) {
+    document.getElementById('results-count').textContent = `Showing ${data.length} of ${QA.length}`;
+
+    if (!data.length) {
+        document.getElementById('tbl-wrap').innerHTML =
+            '<p style="text-align:center;padding:40px 0;color:#aaa;">No results match the selected filters.</p>';
+        return;
+    }
+
+    let html = `
+    <table>
+        <thead>
+            <tr>
+                <th style="width:140px">Analyst</th>
+                <th style="width:110px">Topic</th>
+                <th style="width:130px">Subtopic</th>
+                <th style="width:220px">Question</th>
+                <th>Key Insight</th>
+                <th style="width:90px">Sentiment</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    data.forEach(row => {
+        html += `
+        <tr>
+            <td>
+                <div class="aname">${row.analyst}</div>
+                <div class="afirm">${row.firm}</div>
+            </td>
+            <td><span class="chip ${topicChipClass(row.topic)}">${row.topic}</span></td>
+            <td style="font-size:12px;color:#555;">${row.subtopic}</td>
+            <td style="font-size:12px;color:#444;line-height:1.5;">${row.question}</td>
+            <td style="font-size:12px;color:#5B616E;line-height:1.6;">${row.insight}</td>
+            <td style="white-space:nowrap;">
+                <span class="sdot sdot-${row.sentiment}"></span>
+                <span style="font-size:12px;">${row.sentiment}</span>
+            </td>
+        </tr>
+        `;
+    });
+
+    html += '</tbody></table>';
+    document.getElementById('tbl-wrap').innerHTML = html;
+}
+
+// ─── FILTERS ───────────────────────────────────────────────────────────────
+function applyFilters() {
+    const topic     = document.getElementById('f-topic').value;
+    const firm      = document.getElementById('f-firm').value;
+    const sentiment = document.getElementById('f-sentiment').value;
+    const search    = document.getElementById('f-search').value.toLowerCase().trim();
+
+    const filtered = QA.filter(r => {
+        if (topic     !== 'all' && r.topic     !== topic)     return false;
+        if (firm      !== 'all' && r.firm      !== firm)      return false;
+        if (sentiment !== 'all' && r.sentiment !== sentiment) return false;
+        if (search && ![r.analyst, r.firm, r.question, r.insight, r.subtopic, r.topic]
+            .some(s => s.toLowerCase().includes(search))) return false;
+        return true;
+    });
+
+    buildTopicChart(filtered);
+    renderTable(filtered);
+}
+
+function resetFilters() {
+    ['f-topic','f-firm','f-sentiment'].forEach(id => document.getElementById(id).value = 'all');
+    document.getElementById('f-search').value = '';
+    applyFilters();
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+buildTopicChart(QA);
+renderTable(QA);
+</script>
+</body>
+</html>

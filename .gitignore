@@ -4,3 +4,9 @@
 node_modules/
 .idea/
 *.swp
+.playwright-mcp/
+.scratch/
+writing/CHreading/
+projects/audiobooks/**/*.wav
+career/resume/.~lock.*
+career/resume/*.tmp

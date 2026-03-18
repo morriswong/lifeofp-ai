@@ -1,0 +1,190 @@
+{
+  "description": "Weekly spot trading data for 4 cryptocurrency exchanges across BTC-USD and ETH-USD, plus market news. 10 weeks from Dec 21 2025 to Feb 22 2026.",
+  "exchanges": ["bullish", "coinbase", "kraken", "bitstamp"],
+  "instruments": ["BTC-USD", "ETH-USD"],
+  "weeks": [
+    {
+      "week_starting": "2025-12-21",
+      "news": [
+        {"headline": "Holiday trading volumes decline across major crypto exchanges as institutional desks wind down for year-end", "source": "coindesk.com"},
+        {"headline": "Robinhood completes Bitstamp acquisition, pledges institutional trading push in 2026", "source": "theblock.co"},
+        {"headline": "Regulated exchanges see growing share of institutional BTC spot flow as compliance requirements tighten", "source": "reuters.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 3031584628.79, "avg_close_price": 87645.14},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 929344903.84, "avg_close_price": 87640.83},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 698955245.12, "avg_close_price": 87646.42},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 387644003.44, "avg_close_price": 87643.81},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 1106743508.29, "avg_close_price": 2948.33},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 301493986.18, "avg_close_price": 2948.61},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 178058896.45, "avg_close_price": 2948.19},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 124880804.57, "avg_close_price": 2948.41}
+      ]
+    },
+    {
+      "week_starting": "2025-12-28",
+      "news": [
+        {"headline": "Bitcoin closes 2025 near $88,600 — up 42% for the year as ETF inflows drive institutional demand", "source": "coindesk.com"},
+        {"headline": "Year-end crypto volumes mixed: BTC spot steady, ETH sees profit-taking ahead of 2026", "source": "theblock.co"},
+        {"headline": "Prime brokers FalconX and Hidden Road report record routing volume to regulated venues in Q4", "source": "reuters.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 4133358166.43, "avg_close_price": 88596.84},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1149859751.85, "avg_close_price": 88592.14},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 913361200.84, "avg_close_price": 88592.33},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 358417556.79, "avg_close_price": 88590.77},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 1609031250.78, "avg_close_price": 3010.21},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 465252765.70, "avg_close_price": 3010.06},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 256674940.64, "avg_close_price": 3009.92},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 107036237.85, "avg_close_price": 3009.89}
+      ]
+    },
+    {
+      "week_starting": "2026-01-04",
+      "news": [
+        {"headline": "Bitcoin opens 2026 at $91,800 — institutional buying resumes after holiday lull", "source": "coindesk.com"},
+        {"headline": "Coinbase reports 18% increase in institutional onboarding in Q4 2025, fee cuts planned", "source": "theblock.co"},
+        {"headline": "APAC crypto trading volumes lag as Singapore regulatory framework review continues", "source": "reuters.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 4844220156.11, "avg_close_price": 91799.80},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1372536269.85, "avg_close_price": 91797.33},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 792204999.22, "avg_close_price": 91794.92},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 418790148.20, "avg_close_price": 91794.90},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 1928173422.90, "avg_close_price": 3159.57},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 401809546.54, "avg_close_price": 3159.32},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 400930998.55, "avg_close_price": 3159.14},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 122325546.54, "avg_close_price": 3159.58}
+      ]
+    },
+    {
+      "week_starting": "2026-01-11",
+      "news": [
+        {"headline": "Bitcoin rally extends to $94,400 as macro conditions favour risk assets", "source": "coindesk.com"},
+        {"headline": "Kraken expands institutional prime services, targets European broker-dealer flow", "source": "theblock.co"},
+        {"headline": "Bitstamp under Robinhood reports strong January — BTC-USD volume up 50% MoM", "source": "coindesk.com"},
+        {"headline": "ETH underperforms BTC in January rally — ETH/BTC ratio hits 6-month low", "source": "theblock.co"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 6484905564.76, "avg_close_price": 94371.59},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1729387120.35, "avg_close_price": 94369.43},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 1182550945.96, "avg_close_price": 94356.04},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 418354384.33, "avg_close_price": 94360.28},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 2188986881.80, "avg_close_price": 3258.71},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 663024317.56, "avg_close_price": 3258.53},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 431342778.57, "avg_close_price": 3258.48},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 141238742.25, "avg_close_price": 3258.37}
+      ]
+    },
+    {
+      "week_starting": "2026-01-18",
+      "news": [
+        {"headline": "Bitcoin pulls back to $90,300 — analysts call it healthy consolidation after January rally", "source": "coindesk.com"},
+        {"headline": "Coinbase announces institutional fee restructuring — maker fees cut 30% for high-volume traders", "source": "theblock.co"},
+        {"headline": "Gibraltar DLT framework cited as gold standard for institutional crypto regulation in EU review", "source": "reuters.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 4335759498.77, "avg_close_price": 90269.73},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1524405300.35, "avg_close_price": 90276.00},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 1102221721.06, "avg_close_price": 90270.10},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 510165214.74, "avg_close_price": 90275.05},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 2030099235.43, "avg_close_price": 3033.88},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 597468173.46, "avg_close_price": 3033.82},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 261277617.60, "avg_close_price": 3033.85},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 197312401.84, "avg_close_price": 3033.63}
+      ]
+    },
+    {
+      "week_starting": "2026-01-25",
+      "news": [
+        {"headline": "Bitcoin drops to $85,800 — sell-off triggered by hawkish Fed commentary and geopolitical tension", "source": "coindesk.com"},
+        {"headline": "Trading volumes surge 40% across major exchanges during sell-off — Bullish sees outsized volume spike", "source": "theblock.co"},
+        {"headline": "ETH follows BTC lower but ETH/BTC ratio stabilises — DeFi activity remains resilient", "source": "coindesk.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 6090641489.59, "avg_close_price": 85766.21},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1934330203.70, "avg_close_price": 85773.14},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 1703413943.26, "avg_close_price": 85770.23},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 836088645.78, "avg_close_price": 85767.08},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 3011692912.57, "avg_close_price": 2819.86},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 772559917.48, "avg_close_price": 2819.81},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 423962512.85, "avg_close_price": 2819.81},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 353882005.30, "avg_close_price": 2819.79}
+      ]
+    },
+    {
+      "week_starting": "2026-02-01",
+      "news": [
+        {"headline": "Bitcoin crashes through $72,000 as macro fears escalate — largest weekly drop since FTX collapse", "source": "coindesk.com"},
+        {"headline": "Institutional flight to quality: regulated exchanges see proportionally higher volume during sell-off", "source": "reuters.com"},
+        {"headline": "Bullish Exchange reports record daily volume as hybrid AMM/CLOB model absorbs liquidation flow", "source": "theblock.co"},
+        {"headline": "ETH breaks below $2,200 — market structure analysts note divergent exchange behaviour", "source": "coindesk.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 12395938999.94, "avg_close_price": 72397.90},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 3817165056.40, "avg_close_price": 72398.29},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 2997313605.72, "avg_close_price": 72411.61},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 1818429128.68, "avg_close_price": 72399.66},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 4757592009.78, "avg_close_price": 2136.95},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 1001053650.23, "avg_close_price": 2136.86},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 685845616.70, "avg_close_price": 2136.74},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 594437601.64, "avg_close_price": 2136.71}
+      ]
+    },
+    {
+      "week_starting": "2026-02-08",
+      "news": [
+        {"headline": "Bitcoin stabilises near $68,700 — bottom-fishing activity detected on regulated venues", "source": "coindesk.com"},
+        {"headline": "Bullish maintains elevated market share post-crash — AMM liquidity cited as differentiator", "source": "theblock.co"},
+        {"headline": "Coinbase institutional volumes normalise faster than smaller venues post-sell-off", "source": "reuters.com"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 5609452584.20, "avg_close_price": 68716.69},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1827776153.85, "avg_close_price": 68720.29},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 1255056005.40, "avg_close_price": 68718.46},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 1173929792.36, "avg_close_price": 68720.18},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 2528428989.39, "avg_close_price": 2033.20},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 364872456.56, "avg_close_price": 2033.16},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 342703297.40, "avg_close_price": 2033.42},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 244820787.04, "avg_close_price": 2033.49}
+      ]
+    },
+    {
+      "week_starting": "2026-02-15",
+      "news": [
+        {"headline": "Bitcoin tests $67,800 as market enters range-bound consolidation phase", "source": "coindesk.com"},
+        {"headline": "APAC crypto volumes surge 28% in Q1 — Singapore and Hong Kong lead institutional adoption", "source": "reuters.com"},
+        {"headline": "Kraken launches APAC institutional desk, targets Singapore-licensed fund managers", "source": "theblock.co"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 3699766061.14, "avg_close_price": 67778.47},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 1366988782.73, "avg_close_price": 67783.29},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 909992174.73, "avg_close_price": 67780.17},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 743071713.65, "avg_close_price": 67777.94},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 1772435254.35, "avg_close_price": 1971.11},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 306084588.63, "avg_close_price": 1971.60},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 205178817.60, "avg_close_price": 1971.21},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 188903442.94, "avg_close_price": 1971.09}
+      ]
+    },
+    {
+      "week_starting": "2026-02-22",
+      "news": [
+        {"headline": "Bitcoin slides to $66,400 — prolonged consolidation tests institutional conviction", "source": "coindesk.com"},
+        {"headline": "Bullish market share recovers to pre-crash levels during low-volatility period", "source": "theblock.co"},
+        {"headline": "MiCA implementation progresses — European regulated exchanges prepare for compliance deadline", "source": "reuters.com"},
+        {"headline": "Derivatives volumes overtake spot on major exchanges — Bybit and OKX lead the shift", "source": "theblock.co"}
+      ],
+      "data": [
+        {"exchange": "coinbase", "instrument": "BTC-USD", "total_volume_usd": 5201867529.68, "avg_close_price": 66374.72},
+        {"exchange": "bitstamp", "instrument": "BTC-USD", "total_volume_usd": 2013841098.06, "avg_close_price": 66376.57},
+        {"exchange": "kraken", "instrument": "BTC-USD", "total_volume_usd": 1197097613.80, "avg_close_price": 66370.50},
+        {"exchange": "bullish", "instrument": "BTC-USD", "total_volume_usd": 887487873.80, "avg_close_price": 66375.36},
+        {"exchange": "coinbase", "instrument": "ETH-USD", "total_volume_usd": 2635548117.13, "avg_close_price": 1949.18},
+        {"exchange": "kraken", "instrument": "ETH-USD", "total_volume_usd": 438898238.06, "avg_close_price": 1949.10},
+        {"exchange": "bitstamp", "instrument": "ETH-USD", "total_volume_usd": 399404292.77, "avg_close_price": 1949.28},
+        {"exchange": "bullish", "instrument": "ETH-USD", "total_volume_usd": 164888499.75, "avg_close_price": 1949.24}
+      ]
+    }
+  ]
+}

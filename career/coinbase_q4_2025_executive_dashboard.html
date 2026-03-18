@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coinbase Q4 2025 — Executive Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
+<style>
+:root {
+  --blue:#0052FF; --dark:#050F22; --mid:#0a2266;
+  --green:#05B169; --red:#FF4949; --amber:#FFA500; --purple:#7048E8;
+  --bg:#EEF3FF; --card:#fff; --text:#0A0B0D; --muted:#5B616E;
+  --gap:16px; --r:12px; --sh:0 2px 10px rgba(0,82,255,.09);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+.wrap{max-width:1440px;margin:0 auto;padding:var(--gap)}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,var(--dark) 0%,var(--mid) 100%);color:#fff;padding:22px 28px;border-radius:var(--r);margin-bottom:var(--gap);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:14px}
+.hdr h1{font-size:20px;font-weight:800;margin-bottom:3px}
+.hdr .sub{font-size:12px;color:rgba(255,255,255,.6)}
+.badges{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.badge{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600}
+.badge.green{background:rgba(5,177,105,.25);border-color:rgba(5,177,105,.4)}
+.badge.red{background:rgba(255,73,73,.25);border-color:rgba(255,73,73,.4)}
+
+/* TABS */
+.tabs{display:flex;gap:4px;background:var(--card);border-radius:var(--r);padding:6px;margin-bottom:var(--gap);box-shadow:var(--sh);overflow-x:auto}
+.tab-btn{padding:8px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);white-space:nowrap;transition:all .15s}
+.tab-btn:hover{color:var(--blue);background:#f0f4ff}
+.tab-btn.active{background:var(--blue);color:#fff}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+/* KPI ROW */
+.krow{display:grid;grid-template-columns:repeat(6,1fr);gap:var(--gap);margin-bottom:var(--gap)}
+.krow.k4{grid-template-columns:repeat(4,1fr)}
+.krow.k3{grid-template-columns:repeat(3,1fr)}
+.kcard{background:var(--card);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh);border-top:3px solid var(--blue)}
+.kcard.g{border-top-color:var(--green)}
+.kcard.r{border-top-color:var(--red)}
+.kcard.a{border-top-color:var(--amber)}
+.kcard.p{border-top-color:var(--purple)}
+.klbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.kval{font-size:24px;font-weight:800;margin-bottom:2px}
+.ksub{font-size:11px;color:var(--muted)}
+.kdelta{font-size:11px;font-weight:600;margin-top:2px}
+.kdelta.up{color:var(--green)}.kdelta.dn{color:var(--red)}.kdelta.nt{color:var(--amber)}
+
+/* GRID */
+.crow{display:grid;gap:var(--gap);margin-bottom:var(--gap)}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:1fr 1fr 1fr}
+.c13{grid-template-columns:1fr 2fr}
+.c31{grid-template-columns:2fr 1fr}
+.cbox{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--sh)}
+.cbox-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.ctitle{font-size:13px;font-weight:700}
+.csub{font-size:11px;color:var(--muted);margin-top:2px}
+.ctag{font-size:10px;background:#EEF2FF;color:var(--blue);padding:3px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.ctag.g{background:#E8F5E9;color:#1B5E20}
+.ctag.r{background:#FFF0F3;color:#C0202A}
+canvas{max-height:280px}
+
+/* GUIDANCE TABLE */
+.gtable{width:100%;border-collapse:collapse;font-size:13px}
+.gtable th{text-align:left;padding:10px 14px;border-bottom:2px solid #eef0f4;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.gtable td{padding:11px 14px;border-bottom:1px solid #f4f6fb;vertical-align:top}
+.gtable tr:last-child td{border-bottom:none}
+.gtable tr:hover td{background:#f6f9ff}
+.gval{font-weight:700;color:var(--text)}
+.gnote{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* FINANCIAL TABLE */
+.ftable-wrap{overflow-x:auto}
+.ftable{width:100%;border-collapse:collapse;font-size:12px;min-width:700px}
+.ftable th{text-align:right;padding:8px 12px;border-bottom:2px solid #eef0f4;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;white-space:nowrap}
+.ftable th:first-child{text-align:left}
+.ftable td{padding:8px 12px;border-bottom:1px solid #f4f6fb;text-align:right;white-space:nowrap}
+.ftable td:first-child{text-align:left;font-weight:600;padding-left:0}
+.ftable tr.section-hdr td{background:#f8f9fb;font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.3px;color:var(--muted);border-top:2px solid #dee2e6}
+.ftable tr.total-row td{font-weight:800;border-top:2px solid #dee2e6}
+.ftable td.pos{color:var(--green)}.ftable td.neg{color:var(--red)}
+.ftable tr:hover td{background:#f8faff}
+.indent{padding-left:22px!important;font-weight:400!important}
+
+/* Q&A TABLE */
+.qwrap{overflow-x:auto}
+.qtable{width:100%;border-collapse:collapse;font-size:12px}
+.qtable th{text-align:left;padding:9px 12px;border-bottom:2px solid #eef0f4;color:var(--muted);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;cursor:pointer}
+.qtable th:hover{color:var(--blue)}
+.qtable td{padding:10px 12px;border-bottom:1px solid #f4f6fb;vertical-align:top}
+.qtable tr:hover td{background:#f8faff}
+.aname{font-weight:700;font-size:12px}
+.afirm{font-size:10px;color:var(--muted)}
+.chip{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;white-space:nowrap}
+.chip-Capital{background:#EEF2FF;color:#3B5BFF}
+.chip-International{background:#F0FFF4;color:#007A52}
+.chip-Revenue{background:#FFF5E4;color:#B35900}
+.chip-Products{background:#F3F0FF;color:#6030D0}
+.chip-Regulatory{background:#FFF0F3;color:#C0202A}
+.chip-Financial{background:#E8F5E9;color:#1B5E20}
+.chip-Metrics{background:#E3F2FD;color:#1565C0}
+.sdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:4px}
+.sdot.Positive{background:var(--green)}.sdot.Negative{background:var(--red)}.sdot.Neutral{background:var(--amber)}
+
+/* FILTER BAR */
+.fbar{background:var(--card);border-radius:var(--r);padding:12px 18px;margin-bottom:var(--gap);display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:var(--sh)}
+.fbar label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.fbar select,.fbar input[type=text]{padding:6px 10px;border:1px solid #d8dde8;border-radius:7px;font-size:12px;color:var(--text);background:#fff;outline:none}
+.fbar select:focus,.fbar input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,82,255,.1)}
+.fbtn{padding:6px 13px;background:var(--blue);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer}
+.fbtn:hover{background:#0042cc}
+#qa-count{margin-left:auto;font-size:12px;color:var(--muted)}
+
+/* INSIGHT GRID */
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap);margin-bottom:var(--gap)}
+.icard{background:var(--card);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh)}
+.ititle{font-size:12px;font-weight:800;display:flex;align-items:center;gap:7px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.3px}
+.idot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.idot.g{background:var(--green)}.idot.a{background:var(--amber)}.idot.r{background:var(--red)}
+.ilist{list-style:none}
+.ilist li{font-size:12px;color:var(--muted);padding:5px 0;border-bottom:1px solid #f2f4f8;display:flex;gap:7px;align-items:flex-start;line-height:1.5}
+.ilist li:last-child{border-bottom:none}
+.ilist li::before{content:'→';color:var(--blue);flex-shrink:0;font-weight:700}
+
+/* DIVIDER */
+.section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #eef0f4}
+
+/* FOOTER */
+.foot{text-align:center;font-size:11px;color:var(--muted);padding:14px;margin-top:4px}
+
+/* RESPONSIVE */
+@media(max-width:1100px){.krow{grid-template-columns:repeat(3,1fr)}.c3{grid-template-columns:1fr 1fr}.c13,.c31{grid-template-columns:1fr}.igrid{grid-template-columns:1fr 1fr}}
+@media(max-width:750px){.krow,.krow.k4,.krow.k3{grid-template-columns:repeat(2,1fr)}.c2,.c3{grid-template-columns:1fr}.igrid{grid-template-columns:1fr}.tabs{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div>
+    <h1>Coinbase Global, Inc. — Executive Dashboard</h1>
+    <div class="sub">Q4 &amp; Full Year 2025 · Shareholder Letter + Analyst Q&amp;A · February 12, 2026</div>
+  </div>
+  <div class="badges">
+    <span class="badge">📅 Feb 12, 2026</span>
+    <span class="badge green">FY25 Rev $7.18B ↑9% YoY</span>
+    <span class="badge">Adj EBITDA $2.81B</span>
+    <span class="badge red">Q4 Net Loss ($667M)</span>
+    <span class="badge">Cash $11.3B</span>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('overview')">📊 Overview</button>
+  <button class="tab-btn" onclick="showTab('revenue')">💰 Revenue</button>
+  <button class="tab-btn" onclick="showTab('expenses')">📉 Expenses &amp; Profitability</button>
+  <button class="tab-btn" onclick="showTab('platform')">🌐 Platform &amp; Products</button>
+  <button class="tab-btn" onclick="showTab('outlook')">🔭 Outlook &amp; Guidance</button>
+  <button class="tab-btn" onclick="showTab('qa')">💬 Analyst Q&amp;A</button>
+</div>
+
+<!-- ══════════════════ TAB 1: OVERVIEW ══════════════════ -->
+<div id="tab-overview" class="tab-pane active">
+
+  <div class="krow">
+    <div class="kcard">
+      <div class="klbl">Q4'25 Total Revenue</div>
+      <div class="kval">$1.78B</div>
+      <div class="kdelta dn">↓ 5.2% vs Q3'25 &nbsp;|&nbsp; ↓ 21.6% vs Q4'24</div>
+    </div>
+    <div class="kcard g">
+      <div class="klbl">FY25 Total Revenue</div>
+      <div class="kval">$7.18B</div>
+      <div class="kdelta up">↑ 9.4% vs FY24 ($6.56B)</div>
+    </div>
+    <div class="kcard a">
+      <div class="klbl">Q4'25 Adj EBITDA</div>
+      <div class="kval">$566M</div>
+      <div class="kdelta dn">↓ 29.3% vs Q3'25 &nbsp;|&nbsp; Margin 33%</div>
+    </div>
+    <div class="kcard r">
+      <div class="klbl">Q4'25 Net Loss</div>
+      <div class="kval">($667M)</div>
+      <div class="kdelta nt">$718M unrealized crypto loss</div>
+    </div>
+    <div class="kcard p">
+      <div class="klbl">Q4'25 Adj Net Income</div>
+      <div class="kval">$178M</div>
+      <div class="kdelta dn">↓ 57.7% vs Q3'25 ($421M)</div>
+    </div>
+    <div class="kcard g">
+      <div class="klbl">Cash &amp; Equivalents</div>
+      <div class="kval">$11.3B</div>
+      <div class="kdelta up">↑ $2.0B vs FY24 ($9.3B)</div>
+    </div>
+  </div>
+
+  <!-- Revenue vs EBITDA Trend -->
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Quarterly Net Revenue Trend</div><div class="csub">Transaction + Subscription &amp; Services ($M)</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-rev-trend"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Net Income vs Adjusted EBITDA</div><div class="csub">GAAP vs non-GAAP profitability ($M)</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-profit-trend"></canvas>
+    </div>
+  </div>
+
+  <!-- Revenue Mix -->
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Q4'25 Revenue Mix</div><div class="csub">Transaction vs Subscription &amp; Services</div></div><span class="ctag g">Q4 2025</span></div>
+      <canvas id="c-rev-mix"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">FY25 vs FY24 — Key Financials</div><div class="csub">Full year comparison ($M)</div></div><span class="ctag">Annual</span></div>
+      <canvas id="c-annual-compare"></canvas>
+    </div>
+  </div>
+
+  <!-- Highlights -->
+  <div class="igrid">
+    <div class="icard">
+      <div class="ititle"><span class="idot"></span>Q4 Financial Highlights</div>
+      <ul class="ilist">
+        <li>Total revenue $1.78B; transaction rev $983M (–6% Q/Q), S&amp;S $727M (–3% Q/Q)</li>
+        <li>Q4 net loss driven by $718M unrealized loss on crypto investment portfolio</li>
+        <li>Adj EBITDA $566M (33% margin); Adj Net Income $178M</li>
+        <li>Q4 total OpEx $1.51B, up 9% Q/Q; SBC $230M (+4% Q/Q)</li>
+        <li>Repurchased 3.3M shares for $850M in Q4; 4.9M more shares for $895M since</li>
+      </ul>
+    </div>
+    <div class="icard">
+      <div class="ititle"><span class="idot g"></span>FY25 Achievements</div>
+      <ul class="ilist">
+        <li>Total trading volume grew 156% Y/Y to $5.2 trillion; market share doubled to 6.4%</li>
+        <li>12 products each generating &gt;$100M annualized revenue (half &gt;$250M; 2 &gt;$1B)</li>
+        <li>S&amp;S revenue grew 23% Y/Y to $2.83B — 5.5× vs 2021 cycle peak</li>
+        <li>FY25 net income $1.26B; Adj EBITDA $2.81B (on revenue of $7.18B)</li>
+        <li>Assets on Platform grew 3× in 3 years; Coinbase holds ~12% of all global crypto</li>
+      </ul>
+    </div>
+    <div class="icard">
+      <div class="ititle"><span class="idot a"></span>Key Risks &amp; Headwinds</div>
+      <ul class="ilist">
+        <li>Consumer take rate compressed by mix shift to Advanced trading and CB1 subscribers</li>
+        <li>Staking revenue declined: lower ETH/SOL prices + falling protocol reward rates</li>
+        <li>Full-time employees +31% Y/Y to 4,951; total OpEx up 35% Y/Y to $5.7B</li>
+        <li>$718M unrealized crypto investment losses in Q4 drove GAAP net loss</li>
+        <li>Q1'26 S&amp;S outlook $550–630M (below Q4's $727M) on lower rates &amp; crypto prices</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end overview -->
+
+<!-- ══════════════════ TAB 2: REVENUE ══════════════════ -->
+<div id="tab-revenue" class="tab-pane">
+
+  <div class="krow k4">
+    <div class="kcard">
+      <div class="klbl">Q4'25 Transaction Revenue</div>
+      <div class="kval">$983M</div>
+      <div class="kdelta dn">↓ 6.1% vs Q3'25 &nbsp;|&nbsp; ↓ 36.9% vs Q4'24</div>
+    </div>
+    <div class="kcard g">
+      <div class="klbl">FY25 Transaction Revenue</div>
+      <div class="kval">$4.06B</div>
+      <div class="kdelta up">↑ 1.7% vs FY24 ($3.99B)</div>
+    </div>
+    <div class="kcard a">
+      <div class="klbl">Q4'25 S&amp;S Revenue</div>
+      <div class="kval">$727M</div>
+      <div class="kdelta dn">↓ 2.6% vs Q3'25</div>
+    </div>
+    <div class="kcard p">
+      <div class="klbl">FY25 S&amp;S Revenue</div>
+      <div class="kval">$2.83B</div>
+      <div class="kdelta up">↑ 22.6% vs FY24 ($2.31B)</div>
+    </div>
+  </div>
+
+  <!-- Transaction Revenue Breakdown -->
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Transaction Revenue — Components</div><div class="csub">Consumer, Institutional, Other ($M)</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-txn-breakdown"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Subscription &amp; Services — Components</div><div class="csub">Stablecoin, Blockchain Rewards, Interest, Other ($M)</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-ss-breakdown"></canvas>
+    </div>
+  </div>
+
+  <!-- S&S Growth + USDC -->
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">S&amp;S Revenue Growth — Annual Trend</div><div class="csub">Subscription &amp; Services transcending the cycle ($M)</div></div><span class="ctag g">53% CAGR since 2021</span></div>
+      <canvas id="c-ss-annual"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Stablecoin Revenue vs USDC in Products</div><div class="csub">USDC held in Coinbase products ($B) and stablecoin revenue ($M)</div></div><span class="ctag g">All-time highs</span></div>
+      <canvas id="c-usdc"></canvas>
+    </div>
+  </div>
+
+  <!-- USDC detail table -->
+  <div class="cbox" style="margin-bottom:var(--gap)">
+    <div class="cbox-hdr"><div><div class="ctitle">USDC Balances &amp; Revenue Breakdown — Q4'25</div><div class="csub">Source-level detail</div></div><span class="ctag g">All-time highs</span></div>
+    <table class="gtable">
+      <thead><tr><th>USDC Category</th><th>Avg Market Cap / Balance</th><th>Q4'25 Revenue</th><th>Commentary</th></tr></thead>
+      <tbody>
+        <tr><td class="gval">USDC in Coinbase Products</td><td>$17.8B (+18% Q/Q — ATH)</td><td class="gval">$172M</td><td><span class="gnote">Corporate balances + customer-held USDC; all-time high driven by CB1 rewards &amp; integrations</span></td></tr>
+        <tr><td class="gval">Off-Platform USDC</td><td>$58.4B (+11% Q/Q)</td><td class="gval">$192M</td><td><span class="gnote">Revenue from Circle relationship (NIM); partially offset by lower effective interest rates post Fed cuts</span></td></tr>
+        <tr style="background:#f8f9fb"><td class="gval" style="font-weight:800">Total Stablecoin Revenue</td><td><strong>$76.2B avg market cap (+$8.4B Q/Q — ATH)</strong></td><td class="gval" style="font-weight:800">$364M</td><td><span class="gnote">+3% Q/Q; Coinbase was largest driver of USDC market cap increase</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Full revenue table -->
+  <div class="cbox" style="margin-bottom:var(--gap)">
+    <div class="cbox-hdr"><div><div class="ctitle">Detailed Revenue Table</div><div class="csub">All revenue line items, 5-quarter view + FY comparison ($M)</div></div><span class="ctag">GAAP</span></div>
+    <div class="ftable-wrap">
+      <table class="ftable">
+        <thead>
+          <tr><th>Revenue Line Item</th><th>Q4'24</th><th>Q1'25</th><th>Q2'25</th><th>Q3'25</th><th>Q4'25</th><th>FY 2024</th><th>FY 2025</th></tr>
+        </thead>
+        <tbody>
+          <tr class="section-hdr"><td colspan="8">Transaction Revenue</td></tr>
+          <tr><td class="indent">Consumer, net</td><td>1,347</td><td>1,096</td><td>650</td><td>844</td><td>734</td><td>3,430</td><td>3,323</td></tr>
+          <tr><td class="indent">Institutional, net</td><td>141</td><td>99</td><td>61</td><td>135</td><td>185</td><td>346</td><td>480</td></tr>
+          <tr><td class="indent">Other transaction revenue, net</td><td>68</td><td>68</td><td>54</td><td>68</td><td>64</td><td>210</td><td>253</td></tr>
+          <tr class="total-row"><td>Total Transaction Revenue</td><td>1,556</td><td>1,262</td><td>764</td><td>1,046</td><td>983</td><td>3,986</td><td>4,055</td></tr>
+          <tr class="section-hdr"><td colspan="8">Subscription &amp; Services Revenue</td></tr>
+          <tr><td class="indent">Stablecoin revenue</td><td>226</td><td>298</td><td>333</td><td>355</td><td>364</td><td>911</td><td>1,349</td></tr>
+          <tr><td class="indent">Blockchain rewards</td><td>215</td><td>197</td><td>145</td><td>185</td><td>152</td><td>706</td><td>677</td></tr>
+          <tr><td class="indent">Interest and finance fee income</td><td>66</td><td>63</td><td>59</td><td>65</td><td>60</td><td>266</td><td>247</td></tr>
+          <tr><td class="indent">Other subscription &amp; services</td><td>135</td><td>141</td><td>120</td><td>143</td><td>152</td><td>425</td><td>555</td></tr>
+          <tr class="total-row"><td>Total S&amp;S Revenue</td><td>641</td><td>698</td><td>656</td><td>747</td><td>727</td><td>2,307</td><td>2,828</td></tr>
+          <tr class="total-row" style="font-size:13px"><td>Net Revenue</td><td>2,197</td><td>1,960</td><td>1,420</td><td>1,793</td><td>1,710</td><td>6,293</td><td>6,883</td></tr>
+          <tr><td class="indent">Corporate interest &amp; other income</td><td>75</td><td>74</td><td>77</td><td>76</td><td>71</td><td>271</td><td>298</td></tr>
+          <tr class="total-row" style="font-size:13px;background:#EEF2FF"><td>Total Revenue</td><td>2,272</td><td>2,034</td><td>1,497</td><td>1,869</td><td>1,781</td><td>6,564</td><td>7,181</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end revenue -->
+
+<!-- ══════════════════ TAB 3: EXPENSES & PROFIT ══════════════════ -->
+<div id="tab-expenses" class="tab-pane">
+
+  <div class="krow k4">
+    <div class="kcard">
+      <div class="klbl">Q4'25 Total OpEx</div>
+      <div class="kval">$1.51B</div>
+      <div class="kdelta dn">↑ 9% vs Q3'25; +22% vs Q4'24</div>
+    </div>
+    <div class="kcard r">
+      <div class="klbl">FY25 Total OpEx</div>
+      <div class="kval">$5.75B</div>
+      <div class="kdelta dn">↑ 35% vs FY24 ($4.26B)</div>
+    </div>
+    <div class="kcard a">
+      <div class="klbl">Q4'25 T&amp;D + G&amp;A</div>
+      <div class="kval">$950M</div>
+      <div class="kdelta dn">T&amp;D $497M | G&amp;A $453M</div>
+    </div>
+    <div class="kcard">
+      <div class="klbl">Q4'25 Stock-Based Comp</div>
+      <div class="kval">$230M</div>
+      <div class="kdelta dn">↑ 4% Q/Q; $839M full year</div>
+    </div>
+  </div>
+
+  <!-- OpEx charts -->
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Operating Expense Components</div><div class="csub">Quarterly breakdown by category ($M)</div></div><span class="ctag r">5 Quarters</span></div>
+      <canvas id="c-opex"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Transaction Expense Rate</div><div class="csub">As % of net revenue (target: Low-to-Mid Teens)</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-txnexp-rate"></canvas>
+    </div>
+  </div>
+
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Profitability — All Three Metrics</div><div class="csub">Net Income, Adj EBITDA, Adj Net Income ($M)</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-profit3"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Headcount Growth</div><div class="csub">Full-time employees (end of quarter)</div></div><span class="ctag r">+31% FY25 YoY</span></div>
+      <canvas id="c-headcount"></canvas>
+    </div>
+  </div>
+
+  <!-- FY25 OpEx drivers -->
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">FY25 vs FY24 OpEx — Incremental Drivers</div><div class="csub">Key drivers of $926M increase in T&amp;D + G&amp;A + S&amp;M ($M)</div></div><span class="ctag r">+27% YoY</span></div>
+      <canvas id="c-opex-drivers"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Adj EBITDA Margin Trend</div><div class="csub">Adjusted EBITDA as % of total revenue</div></div><span class="ctag">5 Quarters</span></div>
+      <canvas id="c-ebitda-margin"></canvas>
+    </div>
+  </div>
+
+  <!-- Full OpEx table -->
+  <div class="cbox" style="margin-bottom:var(--gap)">
+    <div class="cbox-hdr"><div><div class="ctitle">Operating Expenses &amp; Profitability Detail</div><div class="csub">Full income statement view ($M)</div></div><span class="ctag">GAAP</span></div>
+    <div class="ftable-wrap">
+      <table class="ftable">
+        <thead>
+          <tr><th>Line Item</th><th>Q4'24</th><th>Q1'25</th><th>Q2'25</th><th>Q3'25</th><th>Q4'25</th><th>FY 2024</th><th>FY 2025</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Transaction expense</td><td>317</td><td>303</td><td>245</td><td>253</td><td>219</td><td>898</td><td>1,020</td></tr>
+          <tr><td style="font-size:10px;color:var(--muted)">% of net revenue</td><td style="font-size:10px;color:var(--muted)">14%</td><td style="font-size:10px;color:var(--muted)">15%</td><td style="font-size:10px;color:var(--muted)">17%</td><td style="font-size:10px;color:var(--muted)">14%</td><td style="font-size:10px;color:var(--muted)">13%</td><td style="font-size:10px;color:var(--muted)">14%</td><td style="font-size:10px;color:var(--muted)">15%</td></tr>
+          <tr><td>Technology &amp; development</td><td>369</td><td>355</td><td>387</td><td>431</td><td>497</td><td>1,468</td><td>1,671</td></tr>
+          <tr><td>Sales &amp; marketing</td><td>226</td><td>247</td><td>236</td><td>260</td><td>315</td><td>654</td><td>1,059</td></tr>
+          <tr><td>General &amp; administrative</td><td>363</td><td>394</td><td>354</td><td>418</td><td>453</td><td>1,300</td><td>1,620</td></tr>
+          <tr><td>Losses (gains) on crypto — operations</td><td class="pos">(16)</td><td class="neg">34</td><td class="pos">(9)</td><td class="pos">(36)</td><td class="neg">31</td><td class="pos">(72)</td><td class="neg">21</td></tr>
+          <tr><td>Other operating (income) expense</td><td class="pos">(20)</td><td class="pos">(6)</td><td class="neg">308</td><td class="neg">61</td><td class="pos">(7)</td><td class="neg">8</td><td class="neg">356</td></tr>
+          <tr class="total-row"><td>Total Operating Expenses</td><td>1,238</td><td>1,329</td><td>1,522</td><td>1,388</td><td>1,507</td><td>4,257</td><td>5,746</td></tr>
+          <tr class="total-row" style="background:#E8F5E9"><td>Operating Income</td><td class="pos">1,034</td><td class="pos">631</td><td class="neg">(102)</td><td class="pos">405</td><td class="pos">274</td><td class="pos">2,307</td><td class="pos">1,435</td></tr>
+          <tr><td>Interest expense</td><td>(21)</td><td>(21)</td><td>(21)</td><td>(22)</td><td>(23)</td><td>(81)</td><td>(85)</td></tr>
+          <tr><td>Losses (gains) on crypto — investment</td><td class="pos">(476)</td><td class="neg">597</td><td class="pos">(362)</td><td class="pos">(424)</td><td class="neg">718</td><td class="pos">(687)</td><td class="neg">529</td></tr>
+          <tr><td>Other expense (income), net</td><td class="pos">(7)</td><td class="neg">6</td><td class="pos">(1,507)</td><td class="neg">381</td><td class="neg">419</td><td class="pos">(29)</td><td class="pos">(701)</td></tr>
+          <tr class="total-row" style="background:#FFF0F3"><td>Net (Loss) Income</td><td class="pos">1,291</td><td class="pos">66</td><td class="pos">1,429</td><td class="pos">433</td><td class="neg">(667)</td><td class="pos">2,579</td><td class="pos">1,260</td></tr>
+          <tr><td>Adjusted EBITDA (non-GAAP)</td><td class="pos">1,289</td><td class="pos">930</td><td class="pos">512</td><td class="pos">801</td><td class="pos">566</td><td class="pos">3,348</td><td class="pos">2,808</td></tr>
+          <tr><td>Adjusted Net Income (non-GAAP)</td><td class="pos">931</td><td class="pos">524</td><td class="pos">33</td><td class="pos">421</td><td class="pos">178</td><td class="pos">2,073</td><td class="pos">1,156</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end expenses -->
+
+<!-- ══════════════════ TAB 4: PLATFORM ══════════════════ -->
+<div id="tab-platform" class="tab-pane">
+
+  <div class="krow k4">
+    <div class="kcard g">
+      <div class="klbl">Assets on Platform (Q4'25 est.)</div>
+      <div class="kval">~$404B</div>
+      <div class="kdelta up">3× growth in 3 years; ~12% of all global crypto</div>
+    </div>
+    <div class="kcard">
+      <div class="klbl">FY25 Total Trading Volume</div>
+      <div class="kval">$5.23T</div>
+      <div class="kdelta up">↑ 156% YoY; market share 6.4% (doubled)</div>
+    </div>
+    <div class="kcard p">
+      <div class="klbl">Paid CB1 Subscribers</div>
+      <div class="kval">971K</div>
+      <div class="kdelta up">All-time high; 3× in 3 years</div>
+    </div>
+    <div class="kcard a">
+      <div class="klbl">Avg USDC Held in Products</div>
+      <div class="kval">$17.8B</div>
+      <div class="kdelta up">All-time high; +18% Q/Q</div>
+    </div>
+  </div>
+
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Assets on Platform — Quarterly Trend</div><div class="csub">Customer crypto assets held on platform (estimated, $B)</div></div><span class="ctag g">3× in 3 years</span></div>
+      <canvas id="c-aop"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">USDC Growth — Avg Market Cap &amp; On-Platform</div><div class="csub">Quarterly average balances ($B)</div></div><span class="ctag g">ATH Q4'25</span></div>
+      <canvas id="c-usdc2"></canvas>
+    </div>
+  </div>
+
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Paid Coinbase One Subscribers</div><div class="csub">Annual subscriber count (thousands)</div></div><span class="ctag p">ATH 971K</span></div>
+      <canvas id="c-cb1"></canvas>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Products Generating $100M+ Annualized Revenue</div><div class="csub">Number of $100M+ revenue products over time</div></div><span class="ctag">Product Diversification</span></div>
+      <canvas id="c-products"></canvas>
+    </div>
+  </div>
+
+  <!-- Product milestones -->
+  <div class="crow c2" style="margin-bottom:var(--gap)">
+    <div class="cbox">
+      <div class="section-title">2025 Product Milestones</div>
+      <ul class="ilist" style="margin-top:0">
+        <li>Closed Deribit acquisition — became global leader in crypto derivatives by open interest and options volume; all-time high revenue in Q4</li>
+        <li>Launched Prediction Markets in the U.S. (powered by Kalshi) — 2 weeks live at time of earnings; appears incremental to existing users</li>
+        <li>Rolled out stock + ETF trading (equities) inside the Coinbase app — 3,000 stocks at launch, ~10,000 by late Feb 2026</li>
+        <li>BTC Borrow originations exceeded $1.5B+ — BTC-backed lending via onchain rails in the Coinbase app</li>
+        <li>Coinbase One Card: ~$800M cumulative spend at end of Q4; ~$3K/month per cardholder</li>
+        <li>U.S. perpetual-style futures 24/7 — first to market; 4× increase in U.S. derivatives market share YoY</li>
+        <li>DEX integration: access to 20M+ assets; expanded to Solana via Jupiter</li>
+        <li>Base reached Stage 1 decentralization (permissionless fault proofs); ~200ms block times; sub-cent fees</li>
+      </ul>
+    </div>
+    <div class="cbox">
+      <div class="section-title">Institutional &amp; Regulatory Highlights</div>
+      <ul class="ilist" style="margin-top:0">
+        <li>Custodian for &gt;80% of U.S. BTC and ETH ETF assets; $31B peak ETF inflows in 2025</li>
+        <li>270+ Crypto-as-a-Service clients; 150 government agencies</li>
+        <li>Largest FCA-registered VASP in the United Kingdom</li>
+        <li>MiCA license secured in Luxembourg; full EEA migration complete</li>
+        <li>India: 2025 was fundamentals (compliance, banking, localization); 2026 focus on revenue growth</li>
+        <li>x402 open standard announced — stablecoin payments for web requests (agentic commerce)</li>
+        <li>Shopify Payments integration: USDC on Base for mainstream commerce</li>
+        <li>Embedded Wallets fully launched for developers; B2B Payments API and UI rolled out</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Capital table -->
+  <div class="cbox" style="margin-bottom:var(--gap)">
+    <div class="cbox-hdr"><div><div class="ctitle">Capital &amp; Liquidity Position — Q4'25</div><div class="csub">Balance sheet snapshot ($M)</div></div><span class="ctag g">$11.3B cash</span></div>
+    <div class="ftable-wrap">
+      <table class="ftable" style="min-width:500px">
+        <thead><tr><th>Category</th><th>Dec 31, 2025</th><th>Dec 31, 2024</th><th>Change</th></tr></thead>
+        <tbody>
+          <tr><td>Cash and cash equivalents</td><td>$11,285M</td><td>$9,308M</td><td class="pos">+$1,977M</td></tr>
+          <tr><td class="indent">Money market funds</td><td>$6,088M</td><td>—</td><td>—</td></tr>
+          <tr><td class="indent">Cash held at banks</td><td>$1,907M</td><td>—</td><td>—</td></tr>
+          <tr><td class="indent">Payment stablecoins (USDC)</td><td>$3,179M</td><td>—</td><td>—</td></tr>
+          <tr><td class="indent">Cash held at venues</td><td>$111M</td><td>—</td><td>—</td></tr>
+          <tr><td>Crypto assets held for investment</td><td>$1,999M</td><td>$1,553M</td><td class="pos">+$446M</td></tr>
+          <tr><td>Crypto assets held as collateral</td><td>$823M</td><td>$767M</td><td class="pos">+$56M</td></tr>
+          <tr class="total-row"><td>Total Available Resources</td><td>$14,107M</td><td>—</td><td>—</td></tr>
+          <tr><td>Total Assets</td><td>$29,672M</td><td>$22,542M</td><td class="pos">+$7,130M</td></tr>
+          <tr><td>Long-term debt</td><td>$5,937M</td><td>$4,234M</td><td class="neg">+$1,703M</td></tr>
+          <tr><td>Total Shareholders' Equity</td><td>$14,793M</td><td>$10,277M</td><td class="pos">+$4,516M</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- end platform -->
+
+<!-- ══════════════════ TAB 5: OUTLOOK ══════════════════ -->
+<div id="tab-outlook" class="tab-pane">
+
+  <div class="krow k3">
+    <div class="kcard g">
+      <div class="klbl">Q1'26 Transaction Rev (to Feb 10)</div>
+      <div class="kval">~$420M</div>
+      <div class="kdelta nt">~Halfway through Q1; urge caution extrapolating</div>
+    </div>
+    <div class="kcard a">
+      <div class="klbl">Q1'26 S&amp;S Guidance</div>
+      <div class="kval">$550–630M</div>
+      <div class="kdelta dn">Below Q4'25 $727M on lower rates &amp; prices</div>
+    </div>
+    <div class="kcard">
+      <div class="klbl">Buyback Remaining (Feb 10)</div>
+      <div class="kval">$2.3B</div>
+      <div class="kdelta up">New $2B auth + ~$300M prior; 8.2M shares repurchased since Nov 2025</div>
+    </div>
+  </div>
+
+  <div class="crow c2">
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Q1'26 Formal Guidance</div><div class="csub">Official outlook as of February 12, 2026</div></div><span class="ctag a">Forward-Looking</span></div>
+      <table class="gtable">
+        <thead><tr><th>Metric</th><th>Q1'26 Outlook</th><th>Context</th></tr></thead>
+        <tbody>
+          <tr><td class="gval">Transaction Revenue</td><td class="gval">~$420M through Feb 10</td><td><span class="gnote">~Halfway through Q1; extrapolate with caution</span></td></tr>
+          <tr><td class="gval">S&amp;S Revenue</td><td class="gval">$550–$630M</td><td><span class="gnote">Lower effective interest rates, lower avg crypto prices and staking protocol rates vs Q4</span></td></tr>
+          <tr><td class="gval">Transaction Expenses</td><td class="gval">Low-to-Mid Teens % of net rev</td><td><span class="gnote">Dependent on revenue mix; Q4 was 13%</span></td></tr>
+          <tr><td class="gval">T&amp;D + G&amp;A Expenses</td><td class="gval">$925–$975M</td><td><span class="gnote">Roughly flat Q/Q; higher payroll taxes offset by professional fee savings</span></td></tr>
+          <tr><td class="gval">Sales &amp; Marketing</td><td class="gval">$215–$315M</td><td><span class="gnote">Range determined by performance marketing opportunities and USDC rewards driven by avg USDC held</span></td></tr>
+          <tr><td class="gval">Stock-Based Compensation</td><td class="gval">~$250M</td><td><span class="gnote">Driven by recent acquisitions and headcount growth (included in expense ranges above)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cbox">
+      <div class="cbox-hdr"><div><div class="ctitle">Q4'25 Actuals vs Q4 Outlook (Given in Oct)</div><div class="csub">How Coinbase tracked against its own guidance</div></div><span class="ctag g">Beat / In-Line</span></div>
+      <table class="gtable">
+        <thead><tr><th>Metric</th><th>Oct 2025 Outlook</th><th>Q4 Actuals</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td class="gval">S&amp;S Revenue</td><td>$710–$790M</td><td class="gval">$727M</td><td><span class="chip" style="background:#E8F5E9;color:#1B5E20">IN-LINE</span></td></tr>
+          <tr><td class="gval">Transaction Expenses % of rev</td><td>Mid-Teens</td><td class="gval">13%</td><td><span class="chip" style="background:#E8F5E9;color:#1B5E20">BEAT</span></td></tr>
+          <tr><td class="gval">T&amp;D + G&amp;A</td><td>$925–$975M (incl ~$220M SBC)</td><td class="gval">$950M (incl $216M SBC)</td><td><span class="chip" style="background:#E8F5E9;color:#1B5E20">IN-LINE</span></td></tr>
+          <tr><td class="gval">Sales &amp; Marketing</td><td>$215–$315M (incl ~$14M SBC)</td><td class="gval">$315M (incl $14M SBC)</td><td><span class="chip" style="background:#FFF5E4;color:#B35900">HIGH END</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cbox" style="margin-bottom:var(--gap)">
+    <div class="cbox-hdr"><div><div class="ctitle">Q1'26 Expense Guidance vs Q4'25 Actuals</div><div class="csub">Visual comparison of expense guidance ranges ($M)</div></div><span class="ctag a">Guidance</span></div>
+    <canvas id="c-guidance" style="max-height:250px"></canvas>
+  </div>
+
+  <!-- 2026 priorities -->
+  <div class="crow c3">
+    <div class="cbox">
+      <div class="section-title">🏦 Priority 1: Everything Exchange</div>
+      <ul class="ilist" style="margin-top:0">
+        <li>Single trusted platform for crypto, derivatives, equities, and prediction markets</li>
+        <li>Deepen engagement; help customers manage more of their portfolio where assets reside</li>
+        <li>No material dependence on regulatory unlocks for 2026 execution</li>
+        <li>Prediction markets, equities, and futures already live and growing</li>
+      </ul>
+    </div>
+    <div class="cbox">
+      <div class="section-title">💸 Priority 2: Stablecoins &amp; Payments</div>
+      <ul class="ilist" style="margin-top:0">
+        <li>Accelerate USDC utility and payments stack (APIs, wallets, merchant rails)</li>
+        <li>Make value movement faster, cheaper, and always-on for real-world adoption</li>
+        <li>B2B Payments API/UI, Embedded Wallets, Shopify integration already live</li>
+        <li>Disclosure to expand when payments becomes material (no specific TPV guidance yet)</li>
+      </ul>
+    </div>
+    <div class="cbox">
+      <div class="section-title">🔗 Priority 3: Bring the World Onchain</div>
+      <ul class="ilist" style="margin-top:0">
+        <li>Expand DeFi integrations in the Coinbase app; scale Base App with focus on trading</li>
+        <li>Continue to grow activity on Base — more usage powered by Coinbase infrastructure</li>
+        <li>Base token under exploration; no update at time of earnings</li>
+        <li>Coinbase Tokenize (Echo + Token Manager) as 2026 growth platform for token issuers</li>
+      </ul>
+    </div>
+  </div>
+
+</div><!-- end outlook -->
+
+<!-- ══════════════════ TAB 6: Q&A ══════════════════ -->
+<div id="tab-qa" class="tab-pane">
+
+  <div class="fbar">
+    <label>Filter:</label>
+    <select id="f-topic" onchange="qaFilter()">
+      <option value="all">All Topics</option>
+      <option value="Capital Allocation">Capital Allocation</option>
+      <option value="International">International</option>
+      <option value="Revenue">Revenue</option>
+      <option value="Products">Products</option>
+      <option value="Regulatory">Regulatory</option>
+      <option value="Financial Health">Financial Health</option>
+      <option value="Metrics">Metrics</option>
+    </select>
+    <select id="f-firm" onchange="qaFilter()">
+      <option value="all">All Firms</option>
+      <option value="Canaccord Genuity">Canaccord Genuity</option>
+      <option value="Rosenblatt Securities">Rosenblatt Securities</option>
+      <option value="Deutsche Bank">Deutsche Bank</option>
+      <option value="KeyBanc Capital Markets">KeyBanc Capital Markets</option>
+      <option value="Citi">Citi</option>
+      <option value="William Blair">William Blair</option>
+      <option value="Needham &amp; Company">Needham &amp; Company</option>
+      <option value="Barclays">Barclays</option>
+      <option value="Citizens JMP">Citizens JMP</option>
+    </select>
+    <select id="f-sent" onchange="qaFilter()">
+      <option value="all">All Sentiments</option>
+      <option value="Positive">Positive</option>
+      <option value="Neutral">Neutral</option>
+      <option value="Negative">Negative</option>
+    </select>
+    <input type="text" id="f-search" placeholder="🔍 Search…" oninput="qaFilter()" style="width:200px">
+    <button class="fbtn" onclick="qaReset()">Reset</button>
+    <span id="qa-count" style="margin-left:auto;font-size:12px;color:var(--muted)">16 of 16</span>
+  </div>
+
+  <div class="cbox" style="margin-bottom:var(--gap)">
+    <div id="qa-tbl-wrap" class="qwrap"></div>
+  </div>
+
+</div><!-- end qa -->
+
+<footer class="foot">
+  Coinbase Global, Inc. · Q4 &amp; Full Year 2025 · Shareholder Letter (Feb 12, 2026) + Analyst Q&amp;A Transcript · Dashboard compiled Feb 27, 2026 · All figures in USD millions unless noted · Non-GAAP measures as defined by Coinbase
+</footer>
+
+</div><!-- end wrap -->
+
+<script>
+// ── DATA ────────────────────────────────────────────────────────────────────
+
+const QTRS = ['Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25'];
+
+const REV = {
+  consumer:      [1347, 1096, 650, 844, 734],
+  institutional: [141,   99,  61, 135, 185],
+  otherTxn:      [68,    68,  54,  68,  64],
+  totalTxn:      [1556, 1262, 764,1046, 983],
+  stablecoin:    [226,  298, 333, 355, 364],
+  blockchainRwd: [215,  197, 145, 185, 152],
+  interest:      [66,    63,  59,  65,  60],
+  otherSS:       [135,  141, 120, 143, 152],
+  totalSS:       [641,  698, 656, 747, 727],
+  netRevenue:    [2197, 1960,1420,1793,1710],
+  corpInterest:  [75,    74,  77,  76,  71],
+  totalRevenue:  [2272, 2034,1497,1869,1781],
+};
+
+const PROFIT = {
+  netIncome:    [1291,  66, 1429, 433, -667],
+  adjEBITDA:    [1289, 930,  512, 801,  566],
+  adjNetIncome: [931,  524,   33, 421,  178],
+};
+
+const OPEX = {
+  txnExp:  [317, 303, 245, 253, 219],
+  td:      [369, 355, 387, 431, 497],
+  sm:      [226, 247, 236, 260, 315],
+  ga:      [363, 394, 354, 418, 453],
+  totalOp: [1238,1329,1522,1388,1507],
+  txnPct:  [14,  15,  17,  14,  13],
+  sbc:     [222, 191, 196, 222, 230],
+  headcount:[3772,3959,4279,4795,4951],
+};
+
+const AOP = {
+  qtrs:   ['Q1\'23','Q2\'23','Q3\'23','Q4\'23','Q1\'24','Q2\'24','Q3\'24','Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25'],
+  values: [82, 82, 55, 124, 191, 190, 261, 328, 323, 264, 376, 404],
+};
+
+const USDC_Q = {
+  qtrs:       ['Q1\'23','Q2\'23','Q3\'23','Q4\'23','Q1\'24','Q2\'24','Q3\'24','Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25'],
+  onPlatform: [2, 2, 3, 3, 4, 6, 7, 8, 12, 14, 15, 18],
+  offPlatform:[25, 26, 28, 30, 33, 35, 38, 41, 54, 61, 68, 58],
+  marketCap:  [27, 28, 31, 33, 37, 41, 45, 49, 66, 75, 68, 76],
+};
+
+const CB1 = { years:['2023','2024','2025'], subs:[266, 733, 971] };
+
+const SS_ANNUAL = {
+  years: ['2021','2022','2023','2024','2025'],
+  blockchainRwd:[279, 331, 246, 706, 677],
+  stablecoin:   [16,  82, 223, 911,1349],
+  interest:     [109, 187, 195, 266, 247],
+  other:        [113, 198, 518, 425, 555],
+};
+
+const QA = [
+  { analyst:"Joseph Vafi", firm:"Canaccord Genuity", topic:"Capital Allocation", sub:"Bitcoin Strategy",
+    q:"Bitcoin acquisition approach and exposure to other asset classes",
+    ins:"Weekly DCA; 95%+ into BTC; $39M deployed Q4; Q1 modestly higher; doubled native units YoY. Not driven by market signals.", sent:"Positive" },
+  { analyst:"Joseph Vafi", firm:"Canaccord Genuity", topic:"Capital Allocation", sub:"Share Buyback",
+    q:"Is the buyback separate from Bitcoin purchases?",
+    ins:"Fully separate. $2B new auth + ~$300M remaining = $2.3B available as of Feb 10. Focus on SBC dilution offset + opportunistic.", sent:"Positive" },
+  { analyst:"Chris Brendler", firm:"Rosenblatt Securities", topic:"International", sub:"Revenue Mix",
+    q:"International revenue growth and 2026/27 outlook",
+    ins:"High-teens % of revenue; stable for years. MiCA license secured; EU customers migrated to Luxembourg. India next growth market.", sent:"Neutral" },
+  { analyst:"Chris Brendler", firm:"Rosenblatt Securities", topic:"International", sub:"Product Strategy",
+    q:"Product focus for international expansion",
+    ins:"Primarily retail in go-deep markets. Base in 100+ markets. Expanding tradable assets internationally (prediction markets, equities) is a priority.", sent:"Positive" },
+  { analyst:"Brian Bedell", firm:"Deutsche Bank", topic:"Revenue", sub:"Staking Yield",
+    q:"Why did staking yield decline in Q4?",
+    ins:"Two drivers: (1) lower ETH and SOL prices, (2) lower protocol reward rates as networks mature with more participants.", sent:"Negative" },
+  { analyst:"Brian Bedell", firm:"Deutsche Bank", topic:"Products", sub:"Tokenization",
+    q:"Update on the Coinbase Tokenize initiative",
+    ins:"2026 priority. Echo acquisition + LiquiFi → Coinbase Token Manager. Token issuance platform first. Asset tokenization (equities, bonds) awaits regulatory clarity.", sent:"Positive" },
+  { analyst:"Alex Markgraff", firm:"KeyBanc Capital Markets", topic:"Regulatory", sub:"Market Structure Legislation",
+    q:"How dependent is the 12–24 month product roadmap on regulatory unlocks?",
+    ins:"Not materially dependent. 2026 execution largely unblocked. Regulatory unlocks would be additive. Derivatives, spot, equities, prediction markets already in market.", sent:"Positive" },
+  { analyst:"Alex Markgraff", firm:"KeyBanc Capital Markets", topic:"Products", sub:"Payments Disclosure",
+    q:"Will Coinbase add payments-specific metrics or disclosures?",
+    ins:"Will break out when material. Qualitative updates until milestones are hit. Payments is a key 2026 priority.", sent:"Neutral" },
+  { analyst:"Pete Christensen", firm:"Citi", topic:"Revenue", sub:"Take Rate Compression",
+    q:"Q4 take rate compression vs. subscriber growth — revenue destructive?",
+    ins:"Mix shift to Advanced trading + CB1 subscription trading drove lower effective take rate. Unit economics positive. CB1 customers monetize across staking, card, USDC.", sent:"Neutral" },
+  { analyst:"Pete Christensen", firm:"Citi", topic:"Metrics", sub:"MTU Definition",
+    q:"Are Coinbase One subscribers counted in the MTU metric?",
+    ins:"Yes — CB1 subscribers are included in Monthly Transacting Users (MTUs).", sent:"Neutral" },
+  { analyst:"Andrew Jeffrey", firm:"William Blair", topic:"Revenue", sub:"USDC Velocity",
+    q:"USDC velocity acceleration — does it accrue to Coinbase economics?",
+    ins:"Depends on location. USDC on Base → sequencer fees. USDC via payments APIs → product monetization. USDC held on platform → NIM from Circle. Multiple paths.", sent:"Positive" },
+  { analyst:"Andrew Jeffrey", firm:"William Blair", topic:"Regulatory", sub:"Stablecoin Rewards",
+    q:"Is stablecoin rewards restriction a bright red line in supporting legislation?",
+    ins:"Seeking a win-win-win for White House, banks, and crypto. Strongly supports customer reward programs. Actively engaged in legislative process.", sent:"Neutral" },
+  { analyst:"John Todaro", firm:"Needham & Company", topic:"Financial Health", sub:"Expense Management",
+    q:"How aggressive would Coinbase be on expenses in a crypto winter?",
+    ins:"Committed to adj. EBITDA positive in any market. Started 2026 flat on expenses. Diversified revenue provides cushion. Will dynamically revisit if material revenue degradation occurs.", sent:"Positive" },
+  { analyst:"John Todaro", firm:"Needham & Company", topic:"Products", sub:"Prediction Markets",
+    q:"Will prediction markets attract new customers or just existing users?",
+    ins:"Only 2 weeks live; no marketing yet. Appears incremental to existing users. Expects both cross-sell and new user potential. Too early for conclusions.", sent:"Positive" },
+  { analyst:"Ben Budish", firm:"Barclays", topic:"Revenue", sub:"S&S Breakdown",
+    q:"Help understand interest income and 'other' S&S components for Q1 guidance",
+    ins:"Interest income = lending + custodial balances (estimate from balance sheet). CB1 subscriptions = largest in 'Other S&S'. Custody fees = second largest. No component-level Q1 guidance.", sent:"Neutral" },
+  { analyst:"Devin Ryan", firm:"Citizens JMP", topic:"Products", sub:"Base Blockchain",
+    q:"Sequencer fee scaling strategy and potential Base token",
+    ins:"Sequencer fees at millisecond latency — the right level for transaction adoption. Will scale to meet demand, not ahead of it. Base token under exploration; no new updates.", sent:"Positive" },
+];
+
+// ── COLORS ──────────────────────────────────────────────────────────────────
+const C = {
+  blue:'#0052FF', midBlue:'#4A7AFF', lightBlue:'#99B8FF',
+  green:'#05B169', lightGreen:'#A3E4C8',
+  red:'#FF4949', amber:'#FFA500', purple:'#7048E8',
+  orange:'#CC6600', gray:'#8C9BAD',
+};
+
+// ── TAB LOGIC ────────────────────────────────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── CHART HELPERS ────────────────────────────────────────────────────────────
+function mkChart(id, config) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  return new Chart(el.getContext('2d'), config);
+}
+const defOpts = {responsive:true, maintainAspectRatio:false, interaction:{mode:'index',intersect:false}};
+function barOpts(fmt='currency', stacked=false) {
+  return { ...defOpts, plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:14,font:{size:11}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtV(c.parsed.y,fmt)}`}}}, scales:{x:{stacked,grid:{display:false}},y:{stacked,beginAtZero:true,ticks:{callback:v=>fmtV(v,fmt)},grid:{color:'#f0f2f8'}}} };
+}
+function lineOpts(fmt='currency') {
+  return { ...defOpts, plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:14,font:{size:11}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtV(c.parsed.y,fmt)}`}}}, scales:{x:{grid:{display:false}},y:{beginAtZero:false,ticks:{callback:v=>fmtV(v,fmt)},grid:{color:'#f0f2f8'}}} };
+}
+function fmtV(v, fmt='number') {
+  if (fmt==='currency') { const a=Math.abs(v); const s=v<0?'-':''; if(a>=1000) return `${s}$${(a/1000).toFixed(1)}B`; return `${s}$${a.toFixed(0)}M`; }
+  if (fmt==='pct') return `${v.toFixed(1)}%`;
+  if (fmt==='B') return `$${v}B`;
+  if (fmt==='K') return `${(v/1000).toFixed(0)}K`;
+  return v.toLocaleString();
+}
+function ds(label, data, color, opts={}) {
+  return { label, data, backgroundColor: opts.bg || color+'CC', borderColor: color, borderWidth: opts.bw||1.5, borderRadius: opts.br||4, fill: opts.fill||false, tension: opts.tension||0.3, pointRadius: opts.pr||3, pointHoverRadius: 5, ...opts };
+}
+
+// ── OVERVIEW CHARTS ──────────────────────────────────────────────────────────
+
+// Revenue trend
+mkChart('c-rev-trend', { type:'bar', data:{ labels:QTRS, datasets:[
+  ds('Transaction Revenue', REV.totalTxn, C.blue, {br:4}),
+  ds('S&S Revenue', REV.totalSS, C.green, {br:4}),
+]}, options:{...barOpts(),plugins:{...barOpts().plugins,tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmtV(c.parsed.y,'currency')}`}}}} });
+
+// Profitability trend
+mkChart('c-profit-trend', { type:'bar', data:{ labels:QTRS, datasets:[
+  { label:'Net Income / (Loss)', data:PROFIT.netIncome, backgroundColor: PROFIT.netIncome.map(v=>v<0?C.red+'AA':C.blue+'AA'), borderColor: PROFIT.netIncome.map(v=>v<0?C.red:C.blue), borderWidth:1.5, borderRadius:4 },
+  ds('Adj EBITDA', PROFIT.adjEBITDA, C.green, {bg:C.green+'33', bw:2, br:0, fill:false}),
+]}, options: barOpts() });
+
+// Revenue mix Q4'25
+mkChart('c-rev-mix', { type:'doughnut', data:{ labels:['Consumer Txn','Institutional Txn','Other Txn','Stablecoin','Blockchain Rwd','Interest','Other S&S'],
+  datasets:[{ data:[734,185,64,364,152,60,152], backgroundColor:['#0052FF','#4A7AFF','#99B8FF','#05B169','#A3E4C8','#FFA500CC','#7048E8CC'], borderColor:'#fff', borderWidth:3, hoverOffset:8 }] },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{usePointStyle:true,padding:10,font:{size:10}}},tooltip:{callbacks:{label:c=>`${c.label}: $${c.parsed}M`}}}} });
+
+// Annual comparison
+mkChart('c-annual-compare', { type:'bar', data:{ labels:['Total Revenue','Net Revenue','Txn Revenue','S&S Revenue','Adj EBITDA','Net Income'],
+  datasets:[
+    { label:'FY 2024', data:[6564,6293,3986,2307,3348,2579], backgroundColor:C.lightBlue+'CC', borderColor:C.lightBlue, borderWidth:1.5, borderRadius:4 },
+    { label:'FY 2025', data:[7181,6883,4055,2828,2808,1260], backgroundColor:C.blue+'CC', borderColor:C.blue, borderWidth:1.5, borderRadius:4 },
+  ] }, options: barOpts() });
+
+// ── REVENUE TAB CHARTS ───────────────────────────────────────────────────────
+
+// Transaction breakdown
+mkChart('c-txn-breakdown', { type:'bar', data:{ labels:QTRS, datasets:[
+  ds('Consumer', REV.consumer, C.blue, {br:4}),
+  ds('Institutional', REV.institutional, C.purple, {br:4}),
+  ds('Other', REV.otherTxn, C.gray, {br:4}),
+]}, options:{...barOpts(),plugins:{...barOpts().plugins}} });
+
+// S&S breakdown
+mkChart('c-ss-breakdown', { type:'bar', data:{ labels:QTRS, datasets:[
+  ds('Stablecoin', REV.stablecoin, C.green, {br:4}),
+  ds('Blockchain Rewards', REV.blockchainRwd, C.amber, {br:4}),
+  ds('Interest & Finance', REV.interest, C.orange, {br:4}),
+  ds('Other S&S', REV.otherSS, C.purple, {br:4}),
+]}, options:{...barOpts(),plugins:{...barOpts().plugins}} });
+
+// S&S annual
+mkChart('c-ss-annual', { type:'bar', data:{ labels:SS_ANNUAL.years, datasets:[
+  { label:'Blockchain Rewards', data:SS_ANNUAL.blockchainRwd, backgroundColor:C.amber+'CC', borderColor:C.amber, borderWidth:1, borderRadius:4, stack:'s' },
+  { label:'Stablecoin Revenue', data:SS_ANNUAL.stablecoin, backgroundColor:C.green+'CC', borderColor:C.green, borderWidth:1, borderRadius:4, stack:'s' },
+  { label:'Interest & Finance', data:SS_ANNUAL.interest, backgroundColor:C.orange+'CC', borderColor:C.orange, borderWidth:1, borderRadius:4, stack:'s' },
+  { label:'Other S&S', data:SS_ANNUAL.other, backgroundColor:C.purple+'CC', borderColor:C.purple, borderWidth:1, borderRadius:4, stack:'s' },
+]}, options:{...barOpts(),scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,ticks:{callback:v=>fmtV(v,'currency')},grid:{color:'#f0f2f8'}}}} });
+
+// USDC quarterly
+mkChart('c-usdc', { type:'bar', data:{ labels:QTRS, datasets:[
+  { type:'line', label:'USDC in Coinbase Products ($B)', data:[8,12,14,15,18], borderColor:C.green, backgroundColor:'transparent', borderWidth:2.5, tension:0.3, pointRadius:4, yAxisID:'yB' },
+  ds('Stablecoin Revenue ($M)', REV.stablecoin, C.blue, {br:4}),
+]}, options:{...barOpts(),scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{callback:v=>fmtV(v,'currency')},grid:{color:'#f0f2f8'},title:{display:true,text:'Revenue ($M)',font:{size:10}}},yB:{position:'right',beginAtZero:true,grid:{display:false},ticks:{callback:v=>`$${v}B`},title:{display:true,text:'Avg USDC Held ($B)',font:{size:10}}}}} });
+
+// ── EXPENSES TAB ─────────────────────────────────────────────────────────────
+
+// OpEx stacked
+mkChart('c-opex', { type:'bar', data:{ labels:QTRS, datasets:[
+  ds('Transaction Exp', OPEX.txnExp, C.lightBlue, {br:4}),
+  ds('Tech & Dev', OPEX.td, C.blue, {br:4}),
+  ds('Sales & Marketing', OPEX.sm, C.amber, {br:4}),
+  ds('G&A', OPEX.ga, C.purple, {br:4}),
+]}, options:{...barOpts(),plugins:{...barOpts().plugins,tooltip:{mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y}M`}}}} });
+
+// Transaction expense rate
+mkChart('c-txnexp-rate', { type:'line', data:{ labels:QTRS, datasets:[
+  { label:'Txn Exp % of Net Revenue', data:OPEX.txnPct, borderColor:C.red, backgroundColor:C.red+'20', borderWidth:2.5, tension:0.3, pointRadius:5, fill:true },
+  { label:'Target Upper (Mid-Teens ~15%)', data:[15,15,15,15,15], borderColor:C.amber, borderWidth:1.5, borderDash:[6,4], pointRadius:0, fill:false },
+]}, options:{...lineOpts('pct'),scales:{x:{grid:{display:false}},y:{min:10,max:20,ticks:{callback:v=>`${v}%`},grid:{color:'#f0f2f8'}}}} });
+
+// 3 profit metrics
+mkChart('c-profit3', { type:'bar', data:{ labels:QTRS, datasets:[
+  ds('Net Income / (Loss)', PROFIT.netIncome, C.red, {bg:PROFIT.netIncome.map(v=>v<0?C.red+'AA':C.blue+'AA')}),
+  ds('Adj EBITDA', PROFIT.adjEBITDA, C.green, {br:4}),
+  ds('Adj Net Income', PROFIT.adjNetIncome, C.purple, {br:4}),
+]}, options: barOpts() });
+
+// Headcount
+mkChart('c-headcount', { type:'line', data:{ labels:QTRS, datasets:[
+  { label:'Full-Time Employees', data:OPEX.headcount, borderColor:C.blue, backgroundColor:C.blue+'20', borderWidth:2.5, tension:0.3, pointRadius:5, fill:true },
+]}, options:{...lineOpts('number'),scales:{x:{grid:{display:false}},y:{beginAtZero:false,ticks:{callback:v=>v.toLocaleString()},grid:{color:'#f0f2f8'}}}} });
+
+// OpEx drivers FY25 vs FY24 incremental
+mkChart('c-opex-drivers', { type:'bar', data:{
+  labels:['USDC Rewards','Other Marketing','Deal-Related Amortization','Acquired Operations','Regulatory & Policy','Other'],
+  datasets:[{ label:'Incremental FY25 vs FY24 ($M)', data:[217,146,165,108,97,193], backgroundColor:[C.amber+'CC',C.orange+'CC',C.red+'CC',C.purple+'CC',C.blue+'CC',C.gray+'CC'], borderWidth:1, borderRadius:6 }]
+}, options:{...barOpts(),indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`+$${c.parsed.x}M`}}}} });
+
+// EBITDA margin
+const ebitdaMargins = QTRS.map((_,i) => (PROFIT.adjEBITDA[i] / REV.totalRevenue[i] * 100));
+mkChart('c-ebitda-margin', { type:'line', data:{ labels:QTRS, datasets:[
+  { label:'Adj EBITDA Margin %', data:ebitdaMargins, borderColor:C.green, backgroundColor:C.green+'25', borderWidth:2.5, tension:0.3, pointRadius:5, fill:true },
+]}, options:{...lineOpts('pct'),scales:{x:{grid:{display:false}},y:{ticks:{callback:v=>`${v.toFixed(0)}%`},grid:{color:'#f0f2f8'}}}} });
+
+// ── PLATFORM TAB CHARTS ──────────────────────────────────────────────────────
+
+// Assets on Platform
+mkChart('c-aop', { type:'line', data:{ labels:AOP.qtrs, datasets:[
+  { label:'Assets on Platform ($B)', data:AOP.values, borderColor:C.blue, backgroundColor:C.blue+'20', borderWidth:2.5, tension:0.3, pointRadius:4, fill:true },
+]}, options:{...lineOpts('B'),scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{beginAtZero:true,ticks:{callback:v=>`$${v}B`},grid:{color:'#f0f2f8'}}}} });
+
+// USDC growth full
+mkChart('c-usdc2', { type:'bar', data:{ labels:USDC_Q.qtrs, datasets:[
+  { label:'USDC in Coinbase Products ($B)', data:USDC_Q.onPlatform, backgroundColor:C.green+'CC', borderColor:C.green, borderWidth:1, borderRadius:3, stack:'s' },
+  { label:'Off-Platform USDC Balances ($B)', data:USDC_Q.offPlatform, backgroundColor:C.blue+'CC', borderColor:C.blue, borderWidth:1, borderRadius:3, stack:'s' },
+]}, options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:9}}},y:{stacked:true,beginAtZero:true,ticks:{callback:v=>`$${v}B`},grid:{color:'#f0f2f8'}}},plugins:{legend:{position:'top',labels:{usePointStyle:true,padding:12,font:{size:11}}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: $${c.parsed.y}B`}}}} });
+
+// CB1
+mkChart('c-cb1', { type:'bar', data:{ labels:CB1.years, datasets:[
+  { label:'Paid CB1 Subscribers (K)', data:CB1.subs, backgroundColor:[C.blue+'66',C.blue+'99',C.blue+'CC'], borderColor:C.blue, borderWidth:1.5, borderRadius:8 },
+]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y}K subscribers`}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{callback:v=>`${v}K`},grid:{color:'#f0f2f8'}}}} });
+
+// Products >$100M
+mkChart('c-products', { type:'bar', data:{ labels:['2021','2022','2023','2024','2025'], datasets:[
+  { label:'Products >$100M annualized rev', data:[3, 4, 5, 8, 12], backgroundColor:['#0052FF44','#0052FF66','#0052FF88','#0052FFBB','#0052FF'], borderColor:C.blue, borderWidth:1.5, borderRadius:6 },
+]}, options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y} products`}}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{stepSize:2},grid:{color:'#f0f2f8'}}}} });
+
+// ── OUTLOOK TAB ──────────────────────────────────────────────────────────────
+mkChart('c-guidance', { type:'bar', data:{
+  labels:['S&S Revenue','T&D + G&A','Sales & Marketing','Stock-Based Comp'],
+  datasets:[
+    { label:'Q4\'25 Actuals', data:[727, 950, 315, 230], backgroundColor:C.blue+'AA', borderColor:C.blue, borderWidth:1.5, borderRadius:4 },
+    { label:'Q1\'26 Midpoint', data:[590, 950, 265, 250], backgroundColor:C.amber+'AA', borderColor:C.amber, borderWidth:1.5, borderRadius:4 },
+    { label:'Q1\'26 Low', data:[550, 925, 215, 250], backgroundColor:C.green+'44', borderColor:C.green, borderWidth:1, borderDash:[4,3], borderRadius:4 },
+    { label:'Q1\'26 High', data:[630, 975, 315, 250], backgroundColor:C.red+'33', borderColor:C.red, borderWidth:1, borderDash:[4,3], borderRadius:4 },
+  ]
+}, options: barOpts() });
+
+// ── Q&A TABLE ────────────────────────────────────────────────────────────────
+const TOPIC_CHIP = { 'Capital Allocation':'chip-Capital','International':'chip-International','Revenue':'chip-Revenue','Products':'chip-Products','Regulatory':'chip-Regulatory','Financial Health':'chip-Financial','Metrics':'chip-Metrics' };
+
+function qaRender(data) {
+  document.getElementById('qa-count').textContent = `${data.length} of ${QA.length}`;
+  if (!data.length) { document.getElementById('qa-tbl-wrap').innerHTML='<p style="padding:40px;text-align:center;color:#aaa">No results.</p>'; return; }
+  let h = `<table class="qtable"><thead><tr><th>Analyst</th><th>Topic</th><th>Subtopic</th><th>Question</th><th>Key Insight (from CFO Response)</th><th>Tone</th></tr></thead><tbody>`;
+  data.forEach(r => {
+    h += `<tr>
+      <td><div class="aname">${r.analyst}</div><div class="afirm">${r.firm}</div></td>
+      <td><span class="chip ${TOPIC_CHIP[r.topic]||''}">${r.topic}</span></td>
+      <td style="font-size:11px;color:#555">${r.sub}</td>
+      <td style="font-size:12px;color:#444;max-width:180px;line-height:1.5">${r.q}</td>
+      <td style="font-size:12px;color:var(--muted);max-width:320px;line-height:1.6">${r.ins}</td>
+      <td style="white-space:nowrap"><span class="sdot ${r.sent}"></span><span style="font-size:11px">${r.sent}</span></td>
+    </tr>`;
+  });
+  h += '</tbody></table>';
+  document.getElementById('qa-tbl-wrap').innerHTML = h;
+}
+
+function qaFilter() {
+  const topic = document.getElementById('f-topic').value;
+  const firm  = document.getElementById('f-firm').value;
+  const sent  = document.getElementById('f-sent').value;
+  const srch  = document.getElementById('f-search').value.toLowerCase();
+  const f = QA.filter(r => {
+    if (topic!=='all' && r.topic!==topic) return false;
+    if (firm!=='all' && r.firm!==firm) return false;
+    if (sent!=='all' && r.sent!==sent) return false;
+    if (srch && ![r.analyst,r.firm,r.q,r.ins,r.sub,r.topic].some(s=>s.toLowerCase().includes(srch))) return false;
+    return true;
+  });
+  qaRender(f);
+}
+
+function qaReset() {
+  ['f-topic','f-firm','f-sent'].forEach(id=>document.getElementById(id).value='all');
+  document.getElementById('f-search').value='';
+  qaFilter();
+}
+
+qaRender(QA);
+</script>
+</body>
+</html>
